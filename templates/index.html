@@ -1,675 +1,103 @@
-# app.py - Main Flask Application
-from flask import Flask, render_template, request, jsonify, send_file
-from werkzeug.utils import secure_filename
-import os
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
-import uuid
-import io
-import base64
-from datetime import datetime
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['PROCESSED_FOLDER'] = 'processed'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-
-# Create necessary directories
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-os.makedirs(app.config['PROCESSED_FOLDER'], exist_ok=True)
-os.makedirs('static', exist_ok=True)
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def create_vintage_photobooth_strip(image_paths, output_path):
-    """
-    Create a vintage photobooth strip from 4 images
-    """
-    # Strip dimensions (typical photobooth strip is 2x8 inches, we'll use 600x2400px)
-    strip_width = 600
-    strip_height = 2400
-    photo_width = 500
-    photo_height = 500
-    
-    # Create the strip background (vintage cream color)
-    strip = Image.new('RGB', (strip_width, strip_height), color='#f5f5dc')
-    
-    # Load and process each image
-    processed_images = []
-    
-    for i, image_path in enumerate(image_paths):
-        if not os.path.exists(image_path):
-            continue
-            
-        # Open and resize image
-        img = Image.open(image_path)
-        img = img.convert('RGB')
-        
-        # Resize to square, maintaining aspect ratio
-        img.thumbnail((photo_width, photo_height), Image.Resampling.LANCZOS)
-        
-        # Create a square canvas and paste the image centered
-        square_img = Image.new('RGB', (photo_width, photo_height), color='white')
-        paste_x = (photo_width - img.width) // 2
-        paste_y = (photo_height - img.height) // 2
-        square_img.paste(img, (paste_x, paste_y))
-        
-        # Apply vintage effects
-        square_img = apply_vintage_effects(square_img)
-        
-        processed_images.append(square_img)
-    
-    # Position images on the strip
-    y_positions = [50, 650, 1250, 1850]  # Positions for 4 photos
-    
-    for i, img in enumerate(processed_images):
-        if i < len(y_positions):
-            x = (strip_width - photo_width) // 2
-            y = y_positions[i]
-            strip.paste(img, (x, y))
-    
-    # Add vintage photobooth branding/text
-    add_vintage_branding(strip, strip_width, strip_height)
-    
-    # Save the final strip
-    strip.save(output_path, 'JPEG', quality=95)
-    return output_path
-
-def apply_vintage_effects(image):
-    """
-    Apply vintage effects to make photos look old-school
-    """
-    # Convert to grayscale first (classic photobooth look)
-    if request.form.get('color_mode') != 'color':
-        image = image.convert('L').convert('RGB')
-    
-    # Adjust contrast and brightness for vintage look
-    enhancer = ImageEnhance.Contrast(image)
-    image = enhancer.enhance(1.2)
-    
-    enhancer = ImageEnhance.Brightness(image)
-    image = enhancer.enhance(0.9)
-    
-    # Add slight blur for soft vintage feel
-    image = image.filter(ImageFilter.GaussianBlur(radius=0.5))
-    
-    # Add noise/grain effect
-    image = add_grain_effect(image)
-    
-    return image
-
-def add_grain_effect(image):
-    """
-    Add film grain effect to image
-    """
-    import random
-    
-    pixels = image.load()
-    width, height = image.size
-    
-    for x in range(width):
-        for y in range(height):
-            if random.random() < 0.1:  # 10% of pixels get grain
-                r, g, b = pixels[x, y]
-                grain = random.randint(-20, 20)
-                r = max(0, min(255, r + grain))
-                g = max(0, min(255, g + grain))
-                b = max(0, min(255, b + grain))
-                pixels[x, y] = (r, g, b)
-    
-    return image
-
-def add_vintage_branding(strip, width, height):
-    """
-    Add vintage photobooth branding and date
-    """
-    draw = ImageDraw.Draw(strip)
-    
-    # Try to load a font, fallback to default if not available
-    try:
-        font_large = ImageFont.truetype("arial.ttf", 36)
-        font_small = ImageFont.truetype("arial.ttf", 24)
-    except:
-        font_large = ImageFont.load_default()
-        font_small = ImageFont.load_default()
-    
-    # Add "PHOTO BOOTH" text at top
-    text = "PHOTO BOOTH"
-    bbox = draw.textbbox((0, 0), text, font=font_large)
-    text_width = bbox[2] - bbox[0]
-    x = (width - text_width) // 2
-    draw.text((x, 10), text, fill='black', font=font_large)
-    
-    # Add date at bottom
-    date_text = datetime.now().strftime("%m/%d/%Y")
-    bbox = draw.textbbox((0, 0), date_text, font=font_small)
-    text_width = bbox[2] - bbox[0]
-    x = (width - text_width) // 2
-    draw.text((x, height - 40), date_text, fill='black', font=font_small)
-    
-    # Add decorative borders
-    border_width = 3
-    draw.rectangle([border_width, border_width, width-border_width, height-border_width], 
-                  outline='black', width=border_width)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/upload', methods=['POST'])
-def upload_files():
-    if 'photos' not in request.files:
-        return jsonify({'error': 'No photos uploaded'}), 400
-    
-    files = request.files.getlist('photos')
-    
-    if len(files) != 4:
-        return jsonify({'error': 'Please upload exactly 4 photos'}), 400
-    
-    # Save uploaded files
-    saved_files = []
-    session_id = str(uuid.uuid4())
-    
-    for i, file in enumerate(files):
-        if file and allowed_file(file.filename):
-            filename = f"{session_id}_{i}.jpg"
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-            saved_files.append(filepath)
-    
-    if len(saved_files) != 4:
-        return jsonify({'error': 'All files must be valid images'}), 400
-    
-    # Create vintage photobooth strip
-    output_filename = f"photobooth_strip_{session_id}.jpg"
-    output_path = os.path.join(app.config['PROCESSED_FOLDER'], output_filename)
-    
-    try:
-        create_vintage_photobooth_strip(saved_files, output_path)
-        
-        # Clean up uploaded files
-        for file_path in saved_files:
-            if os.path.exists(file_path):
-                os.remove(file_path)
-        
-        return jsonify({
-            'success': True,
-            'image_url': f'/download/{output_filename}',
-            'session_id': session_id
-        })
-    
-    except Exception as e:
-        return jsonify({'error': f'Error processing images: {str(e)}'}), 500
-
-@app.route('/download/<filename>')
-def download_file(filename):
-    file_path = os.path.join(app.config['PROCESSED_FOLDER'], filename)
-    if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True)
-    return "File not found", 404
-
-@app.route('/preview/<filename>')
-def preview_file(filename):
-    file_path = os.path.join(app.config['PROCESSED_FOLDER'], filename)
-    if os.path.exists(file_path):
-        return send_file(file_path)
-    return "File not found", 404
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-# =============================================================================
-# templates/index.html - Frontend HTML Template
-# =============================================================================
-
-"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vintage Photobooth</title>
+    <title>Sabrina's Dream Photobooth ✨</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: fall 3s forwards ease-out;
+            border-radius: 50%; /* Make them round like glitter */
         }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1em;
-        }
-
-        .upload-area {
-            border: 3px dashed #ddd;
-            border-radius: 15px;
-            padding: 40px;
-            margin: 30px 0;
-            background: #f9f9f9;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .upload-area:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .upload-area.dragover {
-            border-color: #667eea;
-            background: #e8f2ff;
-        }
-
-        .upload-icon {
-            font-size: 3em;
-            color: #ddd;
-            margin-bottom: 20px;
-        }
-
-        .upload-text {
-            font-size: 1.2em;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .upload-subtext {
-            font-size: 0.9em;
-            color: #999;
-        }
-
-        #fileInput {
-            display: none;
-        }
-
-        .file-list {
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            margin: 5px 0;
-            background: #f5f5f5;
-            border-radius: 8px;
-            font-size: 0.9em;
-        }
-
-        .file-item .filename {
-            flex: 1;
-            margin-left: 10px;
-        }
-
-        .file-item .remove-btn {
-            background: #ff4757;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .options {
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .option-group {
-            margin: 15px 0;
-        }
-
-        .option-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 20px;
-        }
-
-        .radio-group input[type="radio"] {
-            margin-right: 5px;
-        }
-
-        .process-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1em;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .process-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        .process-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .result {
-            display: none;
-            margin-top: 30px;
-        }
-
-        .result-image {
-            max-width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin: 20px 0;
-        }
-
-        .download-btn {
-            background: #2ed573;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1em;
-            border-radius: 20px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .download-btn:hover {
-            background: #26d0ce;
-            transform: translateY(-2px);
-        }
-
-        .error {
-            color: #ff4757;
-            margin-top: 15px;
-            padding: 10px;
-            background: #ffe0e0;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .success {
-            color: #2ed573;
-            margin-top: 15px;
-            padding: 10px;
-            background: #e8f5e8;
-            border-radius: 8px;
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+                opacity: 0;
             }
-            
-            h1 {
-                font-size: 2em;
+            10% { opacity: 1; }
+            100% {
+                transform: translateY(100vh) translateX(calc(var(--rand-x) * 100vw)) rotate(720deg);
+                opacity: 0;
             }
-            
-            .radio-group {
-                flex-direction: column;
-                gap: 10px;
-            }
+        }
+
+        .confetti-piece:nth-child(even) {
+            animation-duration: 3.5s;
+            animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .confetti-piece:nth-child(3n) {
+            animation-duration: 2.8s;
+            animation-timing-function: ease-in-out;
+        }
+
+        /* Set random x-offset for confetti */
+        .confetti-piece {
+            --rand-x: calc(var(--index) / 100 * 2 - 1); /* Distributes them across x-axis */
+            left: calc(var(--index) * 1%); /* Adjust if needed */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📸 Vintage Photobooth</h1>
-        <p class="subtitle">Upload 4 photos and create your vintage photobooth strip!</p>
-        
+        <h1>📸 Sabrina's Dream Booth 💖</h1>
+        <p class="subtitle">Upload 4 photos and let's create your perfect vintage strip! </p>
+
         <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📷</div>
-            <div class="upload-text">Click or drag 4 photos here</div>
-            <div class="upload-subtext">Supports JPG, PNG, GIF (max 16MB each)</div>
+            <div class="upload-icon">✨</div>
+            <div class="upload-text">Drag & drop your magical moments here</div>
+            <div class="upload-subtext">Or click to select. (JPG, PNG, GIF | Max 16MB each)</div>
         </div>
-        
-        <input type="file" id="fileInput" multiple accept="image/*" max="4">
-        
+
+        <input type="file" id="fileInput" multiple accept="image/*">
+
         <div class="file-list" id="fileList"></div>
-        
+
         <div class="options">
             <div class="option-group">
-                <label>Style:</label>
+                <label>Choose Your Vibe:</label>
                 <div class="radio-group">
-                    <label><input type="radio" name="color_mode" value="bw" checked> Black & White</label>
-                    <label><input type="radio" name="color_mode" value="color"> Color</label>
+                    <label><input type="radio" name="color_mode" value="bw" checked> Classic B&W</label>
+                    <label><input type="radio" name="color_mode" value="sepia"> Warm Sepia</label>
+                    <label><input type="radio" name="color_mode" value="color"> Dreamy Color</label>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <label>Frame It Up:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="frame_style" value="classic" checked> Subtle Edge</label>
+                    <label><input type="radio" name="frame_style" value="polaroid"> Polaroid Perfect</label>
                 </div>
             </div>
         </div>
-        
-        <button class="process-btn" id="processBtn" disabled>Create Photobooth Strip</button>
-        
+
+        <button class="process-btn" id="processBtn" disabled>Conjure My Strip! 🪄</button>
+
         <div class="loading" id="loading">
             <div class="loading-spinner"></div>
-            <p>Creating your vintage photobooth strip...</p>
+            <p>Sprinkling some magic on your photos... Almost there! ✨</p>
         </div>
-        
+
         <div class="error" id="error"></div>
         <div class="success" id="success"></div>
-        
+
         <div class="result" id="result">
-            <h3>Your Vintage Photobooth Strip is Ready!</h3>
+            <h3>Your Enchanting Photobooth Strip is Ready! 🎉</h3>
             <img class="result-image" id="resultImage" alt="Vintage Photobooth Strip">
             <div>
-                <a class="download-btn" id="downloadBtn" href="#" download>Download Strip</a>
-                <button class="download-btn" onclick="location.reload()">Create Another</button>
+                <a class="download-btn download" id="downloadBtn" href="#" download="sabrina_photobooth_strip.jpg">Download Your Memory 🎀</a>
+                <button class="download-btn" id="createAnotherBtn">Create Another Masterpiece 💫</button>
             </div>
         </div>
     </div>
 
-    <script>
-        let selectedFiles = [];
-        const maxFiles = 4;
-        
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const fileList = document.getElementById('fileList');
-        const processBtn = document.getElementById('processBtn');
-        const loading = document.getElementById('loading');
-        const error = document.getElementById('error');
-        const success = document.getElementById('success');
-        const result = document.getElementById('result');
-        const resultImage = document.getElementById('resultImage');
-        const downloadBtn = document.getElementById('downloadBtn');
-        
-        // Upload area click handler
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
-        // File input change handler
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-        
-        // Drag and drop handlers
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
-        
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-        
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            handleFiles(e.dataTransfer.files);
-        });
-        
-        function handleFiles(files) {
-            selectedFiles = [];
-            
-            if (files.length !== maxFiles) {
-                showError(`Please select exactly ${maxFiles} photos.`);
-                return;
-            }
-            
-            for (let file of files) {
-                if (!file.type.startsWith('image/')) {
-                    showError('All files must be images.');
-                    return;
-                }
-                if (file.size > 16 * 1024 * 1024) {
-                    showError('Each file must be under 16MB.');
-                    return;
-                }
-                selectedFiles.push(file);
-            }
-            
-            updateFileList();
-            processBtn.disabled = false;
-            hideMessages();
-        }
-        
-        function updateFileList() {
-            fileList.innerHTML = '';
-            
-            selectedFiles.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <span>📷</span>
-                    <span class="filename">${file.name}</span>
-                    <button class="remove-btn" onclick="removeFile(${index})">×</button>
-                `;
-                fileList.appendChild(fileItem);
-            });
-        }
-        
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            updateFileList();
-            if (selectedFiles.length === 0) {
-                processBtn.disabled = true;
-            }
-        }
-        
-        // Process button handler
-        processBtn.addEventListener('click', async () => {
-            if (selectedFiles.length !== maxFiles) {
-                showError(`Please select exactly ${maxFiles} photos.`);
-                return;
-            }
-            
-            const formData = new FormData();
-            selectedFiles.forEach(file => {
-                formData.append('photos', file);
-            });
-            
-            // Add options
-            const colorMode = document.querySelector('input[name="color_mode"]:checked').value;
-            formData.append('color_mode', colorMode);
-            
-            try {
-                processBtn.disabled = true;
-                loading.style.display = 'block';
-                hideMessages();
-                
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    resultImage.src = data.image_url;
-                    downloadBtn.href = data.image_url;
-                    result.style.display = 'block';
-                    showSuccess('Your vintage photobooth strip is ready!');
-                } else {
-                    showError(data.error || 'An error occurred while processing your photos.');
-                }
-            } catch (err) {
-                showError('Network error. Please try again.');
-            } finally {
-                loading.style.display = 'none';
-                processBtn.disabled = false;
-            }
-        });
-        
-        function showError(message) {
-            error.textContent = message;
-            error.style.display = 'block';
-            success.style.display = 'none';
-        }
-        
-        function showSuccess(message) {
-            success.textContent = message;
-            success.style.display = 'block';
-            error.style.display = 'none';
-        }
-        
-        function hideMessages() {
-            error.style.display = 'none';
-            success.style.display = 'none';
-        }
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
