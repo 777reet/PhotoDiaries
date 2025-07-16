@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     let selectedFiles = [];
-    const maxFiles = 4;
+    const minFiles = 1; // New minimum number of files
+    const maxFiles = 4; // Max number of files remains 4
 
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('fileInput');
@@ -42,12 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleFiles(files) {
         hideMessages();
-        selectedFiles = []; // Reset for new selection
+        // Clear selected files but maintain the structure for new additions
+        selectedFiles = []; 
+        fileList.innerHTML = ''; // Clear display list immediately
 
-        if (files.length !== maxFiles) {
-            showError(`Oh no! Please select exactly ${maxFiles} photos for your strip. 💖`);
-            processBtn.disabled = true;
-            updateFileList(); // Clear any previous valid files from display
+        if (files.length === 0) {
+            showError('Please select at least one photo. ✨');
+            updateProcessButtonState(); // Update button state after clearing files
+            return;
+        }
+
+        // Validate number of files first
+        if (files.length > maxFiles) {
+            showError(`Whoops! Please select a maximum of ${maxFiles} photos. You selected ${files.length}.`);
+            updateProcessButtonState();
             return;
         }
 
@@ -68,11 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!allFilesValid) {
             selectedFiles = []; // Clear files if any invalid
-            processBtn.disabled = true;
-        } else {
-            processBtn.disabled = false;
         }
-        updateFileList();
+        updateFileList(); // Update the displayed list
+        updateProcessButtonState(); // Update button state based on new selectedFiles
     }
 
     function updateFileList() {
@@ -102,16 +109,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function removeFile(index) {
         selectedFiles.splice(index, 1);
         updateFileList();
-        if (selectedFiles.length < maxFiles) { // Re-disable if not enough files
+        updateProcessButtonState(); // Crucial: Call this after removing a file
+        hideMessages(); // Clear error/success messages
+    }
+
+    // New function to handle the button's disabled state
+    function updateProcessButtonState() {
+        // Button enabled if between minFiles and maxFiles
+        if (selectedFiles.length >= minFiles && selectedFiles.length <= maxFiles) {
+            processBtn.disabled = false;
+        } else {
             processBtn.disabled = true;
-            hideMessages(); // Clear error/success messages
         }
     }
 
+
     // Process button handler
     processBtn.addEventListener('click', async () => {
-        if (selectedFiles.length !== maxFiles) {
-            showError(`Psst! You need exactly ${maxFiles} photos to create magic. ✨`);
+        // Client-side check before sending to backend
+        if (selectedFiles.length < minFiles || selectedFiles.length > maxFiles) {
+            showError(`Psst! You need between ${minFiles} and ${maxFiles} photos to create magic. ✨`);
             return;
         }
 
@@ -128,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('frame_style', frameStyle);
         
         try {
-            processBtn.disabled = true;
+            processBtn.disabled = true; // Disable button immediately on click
             loading.style.display = 'block';
             hideMessages();
             resultDiv.style.display = 'none'; // Hide previous result
@@ -154,10 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
             showError('Network error. Are you connected to the internet, sweetie? Try again!');
         } finally {
             loading.style.display = 'none';
-            // Only re-enable process button if there are enough files to try again
-            if (selectedFiles.length === maxFiles) {
-                 processBtn.disabled = false;
-            }
+            // Re-enable process button only if conditions for processing are met (after a potential error)
+            updateProcessButtonState();
         }
     });
 
@@ -205,4 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+    
+    // Initial state setup when the page loads
+    updateProcessButtonState();
 });

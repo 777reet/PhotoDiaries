@@ -1,5 +1,5 @@
-/* Import a lovely vintage-inspired font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Dancing+Script:wght@400;700&display=swap');
+/* Import fonts for Option 1: Grand Hotel for headings, Montserrat for body */
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Montserrat:wght@400;700&display=swap');
 
 :root {
     --primary-color: #A765A2; /* Muted Purple */
@@ -20,7 +20,8 @@
 }
 
 body {
-    font-family: 'Playfair Display', serif; /* Elegant serif font */
+    /* Use Montserrat for general body text */
+    font-family: 'Montserrat', sans-serif;
     background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     min-height: 100vh;
     display: flex;
@@ -45,10 +46,11 @@ body {
 h1 {
     color: var(--primary-color);
     margin-bottom: 15px;
-    font-size: 3em; /* Larger, more impactful */
-    font-weight: 700;
+    font-size: 3.5em; /* Larger for Grand Hotel */
+    font-weight: 400; /* Grand Hotel usually has one weight */
     letter-spacing: 1px;
-    font-family: 'Dancing Script', cursive; /* Elegant script for title */
+    /* Use Grand Hotel for the main title */
+    font-family: 'Grand Hotel', cursive;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -57,6 +59,8 @@ h1 {
     margin-bottom: 40px;
     font-size: 1.2em;
     font-style: italic;
+    /* Montserrat for subtitle */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .upload-area {
@@ -73,14 +77,15 @@ h1 {
 
 .upload-area:hover {
     border-color: var(--primary-color);
-    background: lighten(var(--accent-color), 5%);
+    /* For lighter color, use a fixed color or adjust with a CSS function like color-mix in newer CSS */
+    background: #FFEDD5; /* A slightly lighter cream/peach */
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .upload-area.dragover {
     border-color: var(--primary-color);
-    background: lighten(var(--accent-color), 10%);
+    background: #FFDCB3; /* Even lighter */
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
@@ -96,12 +101,16 @@ h1 {
     color: var(--text-color);
     margin-bottom: 15px;
     font-weight: 700;
+    /* Montserrat for upload text */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .upload-subtext {
     font-size: 1em;
     color: var(--primary-color);
     opacity: 0.8;
+    /* Montserrat for upload subtext */
+    font-family: 'Montserrat', sans-serif;
 }
 
 #fileInput {
@@ -126,6 +135,8 @@ h1 {
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease;
+    /* Montserrat for file item text */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .file-item:hover {
@@ -188,6 +199,8 @@ h1 {
     font-weight: bold;
     color: var(--primary-color);
     font-size: 1.1em;
+    /* Montserrat for option group labels */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .radio-group, .select-group {
@@ -207,6 +220,8 @@ h1 {
     cursor: pointer;
     display: flex;
     align-items: center;
+    /* Montserrat for radio group labels */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .process-btn {
@@ -219,9 +234,11 @@ h1 {
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transition */
     margin-top: 25px;
-    font-weight: bold;
+    font-weight: 700; /* Make it bold */
     letter-spacing: 0.5px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    /* Montserrat for process button */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .process-btn:hover {
@@ -242,6 +259,8 @@ h1 {
     margin-top: 30px;
     color: var(--primary-color);
     font-size: 1.1em;
+    /* Montserrat for loading text */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .loading-spinner {
@@ -279,6 +298,8 @@ h1 {
     color: var(--primary-color);
     font-size: 1.8em;
     margin-bottom: 25px;
+    /* Montserrat for result heading */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .result-image {
@@ -305,6 +326,8 @@ h1 {
     transition: all 0.3s ease;
     font-weight: bold;
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    /* Montserrat for download button */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .download-btn.download {
@@ -325,6 +348,8 @@ h1 {
     border-radius: 10px;
     display: none;
     font-weight: bold;
+    /* Montserrat for error message */
+    font-family: 'Montserrat', sans-serif;
 }
 
 .success {
@@ -335,6 +360,8 @@ h1 {
     border-radius: 10px;
     display: none;
     font-weight: bold;
+    /* Montserrat for success message */
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* Glitter effect on hover for upload area */
@@ -374,7 +401,7 @@ h1 {
         padding: 30px;
     }
     h1 {
-        font-size: 2.5em;
+        font-size: 2.8em; /* Adjusted for smaller screens */
     }
     .upload-area {
         padding: 30px;
@@ -398,7 +425,7 @@ h1 {
         border-radius: 15px;
     }
     h1 {
-        font-size: 2em;
+        font-size: 2.2em; /* Adjusted for smallest screens */
     }
     .subtitle {
         font-size: 1em;

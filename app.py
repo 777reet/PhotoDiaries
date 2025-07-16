@@ -35,29 +35,45 @@ def create_vintage_photobooth_strip(image_paths, output_path, color_mode='bw', f
     strip = Image.new('RGB', (strip_width, strip_height), color=background_color)
     draw = ImageDraw.Draw(strip)
 
-    processed_images = []
+    # --- CRITICAL CHANGE START: Handle varying number of input images ---
+    # Ensure we always have 4 images to process by duplicating the last one if needed
+    processed_image_objects = [] # Store PIL Image objects
+    
+    # Open all provided images first
+    for image_path in image_paths:
+        if os.path.exists(image_path):
+            img = Image.open(image_path).convert('RGB')
+            processed_image_objects.append(img)
+    
+    # If fewer than 4 images were uploaded, duplicate the last one
+    num_uploaded = len(processed_image_objects)
+    if num_uploaded == 0: # Should be caught by the upload route, but good to have a safeguard
+        raise ValueError("No valid images provided for strip creation.")
+        
+    if num_uploaded < 4:
+        last_image = processed_image_objects[-1]
+        for _ in range(4 - num_uploaded):
+            processed_image_objects.append(last_image.copy())
+    # --- CRITICAL CHANGE END ---
 
-    for i, image_path in enumerate(image_paths):
-        if not os.path.exists(image_path):
-            continue
-
-        img = Image.open(image_path).convert('RGB')
-        img.thumbnail((photo_width, photo_height), Image.Resampling.LANCZOS)
+    final_images_for_strip = []
+    for img_obj in processed_image_objects:
+        img_obj.thumbnail((photo_width, photo_height), Image.Resampling.LANCZOS)
 
         square_img = Image.new('RGB', (photo_width, photo_height), color='white')
-        paste_x = (photo_width - img.width) // 2
-        paste_y = (photo_height - img.height) // 2
-        square_img.paste(img, (paste_x, paste_y))
+        paste_x = (photo_width - img_obj.width) // 2
+        paste_y = (photo_height - img_obj.height) // 2
+        square_img.paste(img_obj, (paste_x, paste_y))
 
         # Apply selected vintage effects
         square_img = apply_vintage_effects(square_img, color_mode)
-        processed_images.append(square_img)
+        final_images_for_strip.append(square_img)
 
     # Position images on the strip
     y_positions = [150, 750, 1350, 1950]  # Adjusted positions for 4 photos
 
-    for i, img in enumerate(processed_images):
-        if i < len(y_positions):
+    for i, img in enumerate(final_images_for_strip):
+        if i < len(y_positions): # Always 4 images now due to duplication logic
             x = (strip_width - photo_width) // 2
             y = y_positions[i]
             strip.paste(img, (x, y))
@@ -137,7 +153,7 @@ def add_polaroid_frame(strip, draw, x, y, photo_width, photo_height):
     # Draw the white frame
     draw.rectangle([x - side_border, y - top_border,
                     x + photo_width + side_border, y + photo_height + bottom_border],
-                   fill=frame_color)
+                    fill=frame_color)
     # Paste the image onto the frame
     img_to_paste = strip.crop((x, y, x + photo_width, y + photo_height))
     strip.paste(img_to_paste, (x, y))
@@ -161,11 +177,13 @@ def add_sabrina_branding(strip, width, height):
         font_path = os.path.join('static', 'sabrina-font.ttf')
         if not os.path.exists(font_path):
             # Fallback to a more generic script font if custom font not found
+            # Using a system font that is likely to be present
             font_path = "arialbd.ttf" # Bold Arial as a common fallback
         font_large = ImageFont.truetype(font_path, 60)
         font_medium = ImageFont.truetype(font_path, 40)
         font_small = ImageFont.truetype(font_path, 30)
     except Exception:
+        # If any font loading fails, use default PIL font
         font_large = ImageFont.load_default()
         font_medium = ImageFont.load_default()
         font_small = ImageFont.load_default()
@@ -174,29 +192,47 @@ def add_sabrina_branding(strip, width, height):
 
     # Top Branding: "Sabrina's Dream Booth" or similar
     header_text = "Sabrina's Dream Booth ✨"
-    bbox_header = draw.textbbox((0, 0), header_text, font=font_large)
-    text_width_header = bbox_header[2] - bbox_header[0]
+    # textbbox requires a font argument, even if measuring without text.
+    # It returns (left, top, right, bottom)
+    try:
+        bbox_header = draw.textbbox((0, 0), header_text, font=font_large)
+        text_width_header = bbox_header[2] - bbox_header[0]
+    except AttributeError: # Fallback for older Pillow versions or default font
+        text_width_header = draw.textlength(header_text, font=font_large)
+
     x_header = (width - text_width_header) // 2
     draw.text((x_header, 30), header_text, fill=text_color, font=font_large)
 
     # Add a romantic/vintage quote
     quote = "Capture your sweetest moments."
-    bbox_quote = draw.textbbox((0, 0), quote, font=font_medium)
-    text_width_quote = bbox_quote[2] - bbox_quote[0]
+    try:
+        bbox_quote = draw.textbbox((0, 0), quote, font=font_medium)
+        text_width_quote = bbox_quote[2] - bbox_quote[0]
+    except AttributeError:
+        text_width_quote = draw.textlength(quote, font=font_medium)
+
     x_quote = (width - text_width_quote) // 2
     draw.text((x_quote, 90), quote, fill=text_color, font=font_medium)
 
 
     # Bottom Branding: Date and a fun tagline
     date_text = datetime.now().strftime("%B %d, %Y")
-    bbox_date = draw.textbbox((0, 0), date_text, font=font_small)
-    text_width_date = bbox_date[2] - bbox_date[0]
+    try:
+        bbox_date = draw.textbbox((0, 0), date_text, font=font_small)
+        text_width_date = bbox_date[2] - bbox_date[0]
+    except AttributeError:
+        text_width_date = draw.textlength(date_text, font=font_small)
+
     x_date = (width - text_width_date) // 2
     draw.text((x_date, height - 100), date_text, fill=text_color, font=font_small)
 
     tagline = "#VintageVibes"
-    bbox_tagline = draw.textbbox((0, 0), tagline, font=font_small)
-    text_width_tagline = bbox_tagline[2] - bbox_tagline[0]
+    try:
+        bbox_tagline = draw.textbbox((0, 0), tagline, font=font_small)
+        text_width_tagline = bbox_tagline[2] - bbox_tagline[0]
+    except AttributeError:
+        text_width_tagline = draw.textlength(tagline, font=font_small)
+
     x_tagline = (width - text_width_tagline) // 2
     draw.text((x_tagline, height - 60), tagline, fill=text_color, font=font_small)
 
@@ -207,8 +243,19 @@ def add_sabrina_branding(strip, width, height):
         # For simplicity, we'll draw small circles/stars
         star_char = "★"
         heart_char = "♡"
+        # Using textbbox/textlength for accurate positioning of these symbols
+        try:
+            star_bbox = draw.textbbox((0,0), star_char, font=font_medium)
+            star_width = star_bbox[2] - star_bbox[0]
+            heart_bbox = draw.textbbox((0,0), heart_char, font=font_medium)
+            heart_width = heart_bbox[2] - heart_bbox[0]
+        except AttributeError:
+            star_width = draw.textlength(star_char, font=font_medium)
+            heart_width = draw.textlength(heart_char, font=font_medium)
+
+
         draw.text((50, 40), star_char, fill=text_color, font=font_medium)
-        draw.text((width - 80, 40), heart_char, fill=text_color, font=font_medium)
+        draw.text((width - 50 - heart_width, 40), heart_char, fill=text_color, font=font_medium) # Adjust x to make it right-aligned
     except:
         pass # If special characters don't render, just skip
 
@@ -227,8 +274,11 @@ def upload_files():
 
     files = request.files.getlist('photos')
 
-    if len(files) != 4:
-        return jsonify({'error': 'Please upload exactly 4 photos'}), 400
+    # --- CRITICAL CHANGE START ---
+    # Allow 1 to 4 images
+    if not (1 <= len(files) <= 4):
+        return jsonify({'error': 'Please upload between 1 and 4 photos.'}), 400
+    # --- CRITICAL CHANGE END ---
 
     saved_files = []
     session_id = str(uuid.uuid4())
@@ -246,8 +296,8 @@ def upload_files():
                     os.remove(fp)
             return jsonify({'error': 'All files must be valid images (PNG, JPG, JPEG, GIF) and under 16MB each.'}), 400
 
-    if len(saved_files) != 4:
-        return jsonify({'error': 'Failed to save all 4 valid images.'}), 400
+    # Removed the check for len(saved_files) != 4 here because the main check handles it
+    # and the subsequent logic fills up to 4 images.
 
     output_filename = f"photobooth_strip_{session_id}.jpg"
     output_path = os.path.join(app.config['PROCESSED_FOLDER'], output_filename)
