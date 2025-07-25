@@ -1,120 +1,205 @@
-/* General Body and Container Styling */
+/* --- Global & Body Styling --- */
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300;400;600&family=Parisienne&display=swap');
+
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
-    padding: 20px;
-    background: linear-gradient(135deg, #f7e6f9, #e6f7fa); /* Soft gradient background */
+    padding: 0;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     color: #4A0E4F; /* Deep plum color */
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow: hidden; /* Prevent scroll for animated background */
+    position: relative;
+    background: radial-gradient(circle at center, #fce4ec 0%, #e1bee7 70%, #d1c4e9 100%); /* Soft radial gradient */
 }
 
+/* --- Background Decorations --- */
+.background-decor {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none; /* Allow interaction with elements beneath */
+    overflow: hidden;
+}
+
+.decor-heart, .decor-sparkle, .decor-bubble {
+    position: absolute;
+    font-size: 3em;
+    opacity: 0.3;
+    animation: floatAndFade 20s infinite ease-in-out;
+    filter: blur(1px); /* Soft blur */
+}
+
+.decor-heart { color: #FFC0CB; /* Light Pink */ }
+.decor-sparkle { color: #FFD700; /* Gold */ }
+.decor-bubble { 
+    background-color: rgba(255, 255, 255, 0.4); 
+    border-radius: 50%;
+    width: 50px; height: 50px; 
+    font-size: 0; /* Hide text */
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.decor-1 { top: 10%; left: 5%; animation-delay: 0s; transform: scale(0.8); }
+.decor-2 { top: 30%; right: 10%; animation-delay: 4s; transform: scale(1.1); }
+.decor-3 { bottom: 20%; left: 15%; animation-delay: 8s; transform: scale(0.9); }
+.decor-4 { top: 50%; left: 0%; animation-delay: 12s; transform: scale(1.2); }
+.decor-5 { bottom: 5%; right: 5%; animation-delay: 16s; transform: scale(0.7); }
+
+@keyframes floatAndFade {
+    0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.3; }
+    25% { transform: translateY(-50px) rotate(10deg) scale(1.05); opacity: 0.4; }
+    50% { transform: translateY(-100px) rotate(0deg) scale(1); opacity: 0.5; }
+    75% { transform: translateY(-150px) rotate(-10deg) scale(0.95); opacity: 0.2; }
+    100% { transform: translateY(-200px) rotate(0deg) scale(0.8); opacity: 0; }
+}
+
+/* --- Main Container --- */
 .photobooth-container {
-    background-color: #ffffff; /* White background for the main card */
-    border-radius: 25px; /* Softer rounded corners */
+    background: linear-gradient(160deg, #ffffff 0%, #fffaf0 100%); /* Soft creamy white gradient */
+    border-radius: 40px; /* More pronounced rounded corners */
     padding: 40px 30px;
     box-shadow: 
-        0 8px 30px rgba(0, 0, 0, 0.1), /* Main shadow */
-        0 0 0 10px rgba(255, 255, 255, 0.5), /* Faint white border/glow */
-        0 0 0 12px rgba(255, 192, 203, 0.2); /* Soft pink halo */
-    max-width: 700px; /* Slightly wider for a more elegant feel */
-    width: 90%; /* Responsive width */
+        0 15px 40px rgba(0, 0, 0, 0.15), /* Deeper main shadow */
+        0 0 0 15px rgba(255, 228, 225, 0.6), /* Ethereal blush halo */
+        0 0 0 20px rgba(240, 248, 255, 0.3); /* Fainter light blue aura */
+    max-width: 750px; /* Wider for more comfortable layout */
+    width: 90%;
     text-align: center;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     overflow: hidden; /* Ensure content stays within rounded corners */
+    animation: fadeInScale 1s ease-out; /* Gentle entry animation */
 }
 
-/* Header Section */
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Header Section --- */
 .header-section {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
     position: relative;
+    padding-bottom: 20px; /* Space for tagline */
+    border-bottom: 2px dashed #FFD1DC; /* Delicate separator */
 }
 
 .header-section h1 {
     font-family: 'Grand Hotel', cursive; /* Elegant script font */
-    font-size: 3.5em; /* Larger, more impactful title */
+    font-size: 4.5em; /* Significantly larger title */
     color: #8A2BE2; /* A lovely purple */
     margin: 0;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    line-height: 1;
+    text-shadow: 3px 3px 8px rgba(0,0,0,0.15); /* More prominent shadow */
+    position: relative;
+    display: inline-block; /* To make camera icon absolute relative to it */
 }
 
-.header-icon {
-    width: 60px; /* Adjust size as needed */
-    height: auto;
-    vertical-align: middle;
-    margin-right: 15px;
-    transform: rotate(-10deg); /* Slight rotation for whimsy */
-    filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.1));
+.camera-icon-text {
+    font-size: 0.7em; /* Smaller camera icon relative to text */
+    position: absolute;
+    top: -20px;
+    left: -30px; /* Adjust positioning */
+    transform: rotate(-15deg);
+    animation: floatBob 3s ease-in-out infinite alternate; /* Gentle floating animation */
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+}
+
+@keyframes floatBob {
+    0% { transform: translateY(0) rotate(-15deg); }
+    50% { transform: translateY(-8px) rotate(-10deg); }
+    100% { transform: translateY(0) rotate(-15deg); }
 }
 
 .sparkling-heart {
-    font-size: 2.5em; /* Large, noticeable heart */
-    margin-top: 10px;
+    font-size: 3em; /* Larger, more noticeable heart */
+    margin-top: 15px;
     display: block;
-    animation: pulse 1.5s infinite alternate; /* Gentle pulsating animation */
+    animation: pulseGlow 2s infinite alternate; /* Pulsating glow animation */
+    text-shadow: 0 0 10px #ffc0cb, 0 0 20px #ff69b4; /* Pink glow */
 }
 
-@keyframes pulse {
-    from { transform: scale(1); }
-    to { transform: scale(1.1); }
+@keyframes pulseGlow {
+    from { transform: scale(1); text-shadow: 0 0 10px #ffc0cb; }
+    to { transform: scale(1.1); text-shadow: 0 0 15px #ff69b4, 0 0 25px #ff1493; }
 }
 
 .tagline {
     font-family: 'Lora', serif; /* A more elegant serif for the tagline */
-    font-size: 1.2em;
+    font-size: 1.3em;
     color: #6a0dad; /* Darker purple for contrast */
-    margin-top: 10px;
+    margin-top: 20px;
+    position: relative;
+    /* We could add subtle text path animation or curve here with SVG/JS */
 }
 
-/* Upload Area */
+/* --- Upload Area --- */
 .upload-area {
-    border: 3px dashed #FFD1DC; /* Soft pink dashed border */
-    border-radius: 20px;
-    padding: 40px 20px;
-    background-color: #fff0f5; /* Lighter pink background */
+    border: 4px dashed #FFD1DC; /* Softer, thicker pink dashed border */
+    border-radius: 25px; /* Softer rounded corners */
+    padding: 50px 20px; /* More internal space */
+    background-color: #fff8f8; /* Very light pink background */
     cursor: pointer;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    margin-bottom: 30px;
+    transition: background-color 0.4s ease, border-color 0.4s ease;
+    margin-bottom: 40px;
     position: relative;
+    overflow: hidden; /* For inner animations */
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08) inset; /* Soft inner shadow */
 }
 
 .upload-area:hover {
-    background-color: #ffe4e9; /* Slightly darker on hover */
+    background-color: #ffe8ee; /* Slightly darker on hover */
     border-color: #ffb6c1; /* Brighter pink on hover */
+    box-shadow: 0 5px 25px rgba(0,0,0,0.1) inset, 0 0 15px rgba(255,192,203,0.3); /* Enhanced glow on hover */
 }
 
-.magic-star {
-    font-size: 4em;
-    color: gold;
+.animated-star {
+    font-size: 5em; /* Larger, more central star */
+    color: #FFD700; /* Gold */
     display: block;
-    margin-bottom: 15px;
-    animation: rotateAndSparkle 3s infinite linear; /* Continuous rotation and sparkle */
+    margin-bottom: 20px;
+    animation: rotateAndSparkle 4s infinite linear; /* Continuous rotation and sparkle */
+    text-shadow: 0 0 15px rgba(255,215,0,0.5), 0 0 25px rgba(255,215,0,0.3); /* Gold glow */
 }
 
 @keyframes rotateAndSparkle {
     0% { transform: rotate(0deg) scale(1); opacity: 1; }
-    50% { transform: rotate(180deg) scale(1.1); opacity: 0.8; }
+    25% { transform: rotate(90deg) scale(1.05); opacity: 0.9; }
+    50% { transform: rotate(180deg) scale(1.1); opacity: 1; }
+    75% { transform: rotate(270deg) scale(1.05); opacity: 0.9; }
     100% { transform: rotate(360deg) scale(1); opacity: 1; }
 }
 
-.upload-area p {
-    margin: 5px 0;
-    font-size: 1.1em;
+.drag-text {
+    font-size: 1.3em;
+    font-weight: 500;
     color: #4A0E4F;
+    margin: 10px 0;
 }
 
-.upload-area .or-click {
-    font-size: 0.9em;
+.click-to-select-btn {
+    background: none;
+    border: none;
     color: #9370DB; /* Medium purple */
+    font-size: 1.1em;
     font-style: italic;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: color 0.3s ease;
+}
+
+.click-to-select-btn:hover {
+    color: #6A0DAD; /* Darker purple on hover */
 }
 
 .file-info {
-    font-size: 0.8em;
+    font-size: 0.85em;
     color: #A9A9A9;
     margin-top: 15px;
 }
@@ -123,329 +208,414 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
+    gap: 12px;
+    margin-top: 25px;
 }
 
 .file-preview-item {
     position: relative;
-    width: 80px;
-    height: 80px;
-    border: 2px solid #FFC0CB;
-    border-radius: 10px;
+    width: 90px;
+    height: 90px;
+    border: 3px solid #FFC0CB; /* Pink border */
+    border-radius: 15px; /* Softer corners */
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.file-preview-item:hover {
+    transform: translateY(-5px) rotate(2deg); /* Playful lift and rotate on hover */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
 
 .file-preview-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: brightness(0.95); /* Slightly muted */
 }
 
 .file-preview-item .remove-file {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: #FF69B4;
+    top: -8px;
+    right: -8px;
+    background-color: #FF69B4; /* Hot pink */
     color: white;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 0.8em;
+    font-size: 0.9em;
+    font-weight: bold;
     cursor: pointer;
     z-index: 10;
-    transition: background-color 0.2s ease;
+    border: 2px solid white; /* White border for pop */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .file-preview-item .remove-file:hover {
-    background-color: #CD5C5C;
+    background-color: #CD5C5C; /* Red on hover */
+    transform: scale(1.1);
 }
 
-/* Options Section */
+/* --- Options Section --- */
 .options-section {
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
 .option-group {
-    border: 2px solid #FFC0CB; /* Light pink border */
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 25px;
-    background-color: #fffaf0; /* Creamy background */
-    box-shadow: inset 0 0 10px rgba(255, 192, 203, 0.2); /* Inner glow */
+    border: 2px solid #FFD1DC; /* Light pink border */
+    border-radius: 20px; /* More rounded */
+    padding: 25px;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #fffaf0, #fff0f5); /* Soft gradient background for group */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08); /* Soft group shadow */
 }
 
 .option-group legend {
     font-family: 'Lora', serif; /* Elegant serif for legends */
-    font-size: 1.3em;
+    font-size: 1.5em; /* Larger legend text */
     font-weight: 600;
     color: #8A2BE2; /* Purple heading */
-    padding: 0 10px;
-    text-align: left;
-    margin-left: 20px; /* Indent legend slightly */
+    padding: 0 15px;
+    text-align: center; /* Center legend */
+    background-color: #fff; /* White background for legend text */
+    border-radius: 10px;
+    position: relative;
+    top: -35px; /* Position legend outside the border */
+    display: inline-block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .option-row {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center; /* Center cards within the group */
-    gap: 15px;
-    margin-top: 15px;
+    justify-content: center;
+    gap: 20px; /* Increased gap between cards */
+    margin-top: -15px; /* Pull options up towards the legend */
 }
 
 .option-card {
-    display: block; /* Make the label itself the clickable card */
+    display: block;
     background-color: #FFD1DC; /* Soft pink card background */
-    border-radius: 15px;
-    padding: 15px 20px;
+    border-radius: 20px; /* More rounded pill shape */
+    padding: 20px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: calc(33% - 20px); /* For 3 items per row */
-    min-width: 160px; /* Minimum width to prevent squishing */
+    transition: all 0.4s ease;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12); /* Softer shadow */
+    width: calc(33% - 40px); /* For 3 items per row, accounting for gap */
+    min-width: 180px; /* Slightly larger min-width */
     display: flex;
+    flex-direction: column; /* Stack content */
     align-items: center;
     justify-content: center;
     text-align: center;
-    position: relative; /* For the radio button indicator */
+    position: relative;
+    border: 2px solid transparent; /* For selected state outline */
 }
 
 .option-card input[type="radio"] {
     position: absolute;
-    opacity: 0; /* Hide default radio button */
-    pointer-events: none; /* Prevent clicks on hidden radio */
+    opacity: 0;
+    pointer-events: none;
 }
 
 .option-card .card-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    color: #4A0E4F; /* Dark plum text */
+    gap: 10px;
+    color: #4A0E4F;
     font-weight: 500;
-    font-size: 0.95em;
+    font-size: 1.05em; /* Slightly larger text */
+    transition: color 0.3s ease;
 }
 
 .option-card .card-icon {
-    font-size: 1.8em; /* Larger icons */
+    font-size: 2.2em; /* Larger icons */
+    transition: transform 0.3s ease;
 }
 
 .option-card:hover {
-    background-color: #FFB6C1; /* Darker pink on hover */
-    transform: translateY(-3px); /* Slight lift effect */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #FFB6C1, #FFD1DC); /* Gentle gradient on hover */
+    transform: translateY(-8px); /* More pronounced lift effect */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 .option-card input[type="radio"]:checked + .card-content {
-    /* Style when selected */
     color: #FFFFFF; /* White text when selected */
     font-weight: 600;
 }
 
-.option-card input[type="radio"]:checked + .card-content::before {
-    content: '✓'; /* Checkmark icon */
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-color: #8A2BE2; /* Purple checkmark background */
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.8em;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+.option-card input[type="radio"]:checked + .card-content .card-icon {
+    transform: scale(1.2); /* Icon pops when selected */
 }
 
 .option-card input[type="radio"]:checked {
     border-color: #8A2BE2; /* Highlight border on selection */
     background: linear-gradient(45deg, #8A2BE2, #9370DB); /* Gradient background on selection */
-    box-shadow: 0 0 15px rgba(138, 43, 226, 0.5); /* Stronger glow on selection */
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.6); /* Stronger glow on selection */
 }
 
-/* Submit Button */
-.submit-button {
+.option-card input[type="radio"]:checked + .card-content::after {
+    content: '✓'; /* Checkmark icon */
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #8A2BE2; /* Purple checkmark background */
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1em;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    transform: scale(0); /* Start hidden */
+    animation: popIn 0.3s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Pop in animation */
+}
+
+@keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+
+/* --- Animated Buttons (Shared Styles) --- */
+.animated-button {
     background: linear-gradient(45deg, #FF69B4, #9370DB); /* Pink to purple gradient */
     color: white;
     border: none;
     border-radius: 50px; /* Pill shape */
-    padding: 15px 30px;
-    font-size: 1.3em;
+    padding: 18px 35px; /* Larger padding */
+    font-size: 1.4em; /* Larger font */
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* Deeper shadow */
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px; /* More space */
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px; /* More spaced out text */
+    text-decoration: none; /* For download link */
+    background-size: 200% 200%; /* For animating gradient position */
+    animation: gradientShift 5s ease infinite alternate; /* Continuous gradient animation */
 }
 
-.submit-button:hover {
-    transform: translateY(-5px); /* Lift effect */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(45deg, #FF1493, #6A0DAD); /* Stronger gradient on hover */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.animated-button:hover {
+    transform: translateY(-8px); /* More pronounced lift effect */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35); /* Even deeper shadow */
+    animation: gradientShift 3s ease infinite alternate, pulseButton 1s infinite alternate; /* Faster gradient + pulse */
+}
+
+@keyframes pulseButton {
+    from { transform: translateY(-8px) scale(1); }
+    to { transform: translateY(-10px) scale(1.02); }
 }
 
 .sparkle-icon {
-    font-size: 1.2em;
-    animation: sparkleEffect 1s infinite alternate;
+    font-size: 1.3em;
+    animation: sparkleEffect 1.5s infinite alternate; /* More dynamic sparkle */
 }
 
 @keyframes sparkleEffect {
-    from { transform: scale(1) rotate(0deg); opacity: 1; }
-    to { transform: scale(1.2) rotate(15deg); opacity: 0.8; }
+    0% { transform: scale(1) rotate(0deg); opacity: 1; text-shadow: none; }
+    50% { transform: scale(1.3) rotate(30deg); opacity: 0.8; text-shadow: 0 0 8px gold; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; text-shadow: none; }
 }
 
-/* Result Section */
+
+/* --- Result Section --- */
 .result-section {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 2px dashed #FFD1DC; /* Separator line */
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 3px dashed #FFD1DC; /* Thicker, more prominent separator */
 }
 
 .result-message {
     font-family: 'Lora', serif;
-    font-size: 1.4em;
+    font-size: 1.6em; /* Larger, more inviting message */
     color: #8A2BE2;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.05);
 }
 
 .processed-image {
     max-width: 100%;
     height: auto;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 0 5px #FFD1DC; /* Pink border/glow */
-    margin-bottom: 25px;
+    border-radius: 20px; /* Softer edges */
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.25), /* Deep shadow */
+        0 0 0 8px #FFD1DC, /* Pink border/glow */
+        0 0 0 12px rgba(255, 228, 225, 0.5); /* Fainter blush halo */
+    margin-bottom: 35px;
+    transition: transform 0.5s ease-out; /* Smooth entry */
+    animation: popInImage 0.8s ease-out;
+}
+
+@keyframes popInImage {
+    from { transform: scale(0.8) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 .result-actions {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 25px; /* Increased gap */
 }
 
-.download-button,
-.create-another-button {
-    background: linear-gradient(45deg, #9370DB, #FF69B4); /* Purple to pink gradient */
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 12px 25px;
-    font-size: 1.1em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none; /* For download link */
-}
-
-.download-button:hover,
-.create-another-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-    background: linear-gradient(45deg, #6A0DAD, #FF1493); /* Stronger gradient on hover */
-}
-
+/* Download and Create Another buttons inherit animated-button styles */
 .download-icon, .reset-icon {
-    font-size: 1em;
+    font-size: 1.1em;
 }
 
-/* Error Message */
+/* --- Error Message --- */
 .error-message {
-    background-color: #ffcccc;
-    color: #d10000;
-    border: 1px solid #d10000;
-    border-radius: 10px;
-    padding: 15px;
-    margin-top: 20px;
+    background-color: #fce4ec; /* Lighter pink for error */
+    color: #d84315; /* Orange-red for error text */
+    border: 2px solid #ffab91; /* Soft orange border */
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 30px;
     font-weight: 500;
+    box-shadow: 0 5px 15px rgba(255, 100, 100, 0.2);
+    animation: shake 0.5s ease-in-out; /* Gentle shake for error */
 }
 
-/* Loading Overlay */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* --- Loading Overlay --- */
 .loading-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 240, 245, 0.8); /* Semi-transparent light pink */
+    background: radial-gradient(circle at center, rgba(255, 240, 245, 0.9) 0%, rgba(220, 230, 250, 0.8) 100%); /* Dreamy gradient overlay */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    backdrop-filter: blur(5px); /* Soft blur effect */
+    backdrop-filter: blur(8px); /* Stronger blur effect */
+    animation: fadeIn 0.5s ease-out;
 }
 
-.spinner {
-    font-size: 4em;
-    animation: spin 1.5s infinite linear; /* Gentle spin animation */
-    margin-bottom: 20px;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+.loading-spinner-container {
+    position: relative;
+    width: 100px; /* Adjust size of spinner area */
+    height: 100px;
+    margin-bottom: 30px;
 }
+
+.loading-spinner-petal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3.5em; /* Size of individual elements */
+    opacity: 0;
+    animation: petalDance 4s infinite ease-in-out forwards;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.petal-1 { animation-delay: 0s; }
+.petal-2 { animation-delay: 1s; }
+.petal-3 { animation-delay: 2s; }
+.petal-4 { animation-delay: 3s; }
+
+@keyframes petalDance {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.2) rotate(72deg); opacity: 1; }
+    40% { transform: translate(-50%, -50%) scale(1) rotate(144deg); opacity: 0.8; }
+    60% { transform: translate(-50%, -50%) scale(0.8) rotate(216deg); opacity: 0.6; }
+    80% { transform: translate(-50%, -50%) scale(0.5) rotate(288deg); opacity: 0.3; }
+    100% { transform: translate(-50%, -50%) scale(0) rotate(360deg); opacity: 0; }
+}
+
 
 .loading-overlay p {
-    font-size: 1.5em;
-    color: #8A2BE2;
-    font-weight: 600;
-    animation: fadeInOut 2s infinite alternate; /* Pulsating text effect */
+    font-family: 'Parisienne', cursive; /* Elegant cursive font for loading text */
+    font-size: 2em; /* Larger loading text */
+    color: #6a0dad;
+    font-weight: 400;
+    animation: fadeInOutText 3s infinite alternate; /* Pulsating text effect */
 }
 
-@keyframes fadeInOut {
-    0% { opacity: 0.5; }
-    100% { opacity: 1; }
+@keyframes fadeInOutText {
+    0% { opacity: 0.6; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-5px); }
+    100% { opacity: 0.6; transform: translateY(0); }
 }
 
-/* Utility Classes */
+/* --- Utility Classes --- */
 .hidden {
     display: none !important;
 }
 
-/* Responsive Adjustments */
+/* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
     .photobooth-container {
         padding: 30px 20px;
-        box-shadow: 
-            0 5px 20px rgba(0, 0, 0, 0.1),
-            0 0 0 5px rgba(255, 255, 255, 0.5),
-            0 0 0 8px rgba(255, 192, 203, 0.2);
+        border-radius: 30px;
     }
 
     .header-section h1 {
-        font-size: 2.8em;
+        font-size: 3.5em;
     }
 
-    .header-icon {
-        width: 45px;
+    .camera-icon-text {
+        font-size: 0.6em;
+        top: -15px;
+        left: -20px;
+    }
+
+    .sparkling-heart {
+        font-size: 2.5em;
     }
 
     .tagline {
-        font-size: 1em;
+        font-size: 1.1em;
     }
 
     .upload-area {
-        padding: 30px 15px;
+        padding: 40px 15px;
     }
 
-    .magic-star {
-        font-size: 3em;
+    .animated-star {
+        font-size: 4em;
+    }
+
+    .drag-text {
+        font-size: 1.1em;
+    }
+
+    .option-group legend {
+        font-size: 1.3em;
+        top: -25px;
     }
 
     .option-row {
@@ -454,20 +624,32 @@ body {
     }
 
     .option-card {
-        width: 80%; /* Wider cards when stacked */
+        width: 90%; /* Wider cards when stacked */
         min-width: unset;
-        padding: 12px 15px;
+        padding: 15px;
+    }
+    .option-card .card-icon {
+        font-size: 1.8em;
+    }
+    .option-card .card-content {
+        font-size: 0.95em;
     }
 
-    .submit-button,
-    .download-button,
-    .create-another-button {
-        font-size: 1.1em;
-        padding: 12px 20px;
+    .animated-button {
+        font-size: 1.2em;
+        padding: 15px 25px;
+    }
+
+    .result-message {
+        font-size: 1.3em;
     }
 
     .result-actions {
         flex-direction: column;
         gap: 15px;
+    }
+
+    .loading-overlay p {
+        font-size: 1.5em;
     }
 }

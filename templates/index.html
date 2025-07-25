@@ -4,25 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sabrina's Dream Booth ✨</title>
-    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300;400;600&family=Parisienne&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <script src="https://kit.fontawesome.com/your-font-awesome-kit-id.js" crossorigin="anonymous"></script> 
     </head>
 <body>
+    <div class="background-decor">
+        <div class="decor-heart decor-1"></div>
+        <div class="decor-sparkle decor-2"></div>
+        <div class="decor-bubble decor-3"></div>
+        <div class="decor-heart decor-4"></div>
+        <div class="decor-sparkle decor-5"></div>
+    </div>
+
     <div class="photobooth-container">
         <header class="header-section">
-            <img src="{{ url_for('static', filename='camera_icon.png') }}" alt="Camera" class="header-icon">
-            <h1>Sabrina's Dream Booth</h1>
-            <div class="sparkling-heart">❤️✨</div>
+            <h1>
+                <span class="camera-icon-text">📸</span> Sabrina's Dream Booth
+            </h1>
+            <div class="sparkling-heart">💖✨</div>
             <p class="tagline">Upload your magical moments and let's create a vintage strip!</p>
         </header>
 
         <form id="uploadForm" enctype="multipart/form-data">
             <div class="upload-area" id="dropArea">
-                <span class="magic-star">✨</span>
-                <p>Drag & drop your magical moments here</p>
-                <p class="or-click">Or click to select.</p>
+                <span class="magic-star animated-star">✨</span>
+                <p class="drag-text">Drag & drop your magical moments here</p>
+                <button type="button" class="click-to-select-btn">Or click to select</button>
                 <input type="file" id="photoUpload" name="photos" accept="image/png, image/jpeg, image/gif" multiple style="display: none;">
                 <p class="file-info">JPG, PNG, GIF | Max 16MB each</p>
                 <div id="filePreviews" class="file-previews"></div>
@@ -104,7 +112,7 @@
                 </fieldset>
             </div>
 
-            <button type="submit" class="submit-button">
+            <button type="submit" class="submit-button animated-button">
                 Conjure My Strip! <span class="sparkle-icon">✨</span>
             </button>
         </form>
@@ -113,8 +121,8 @@
             <p class="result-message">Your vintage strip is ready, darling!</p>
             <img id="processedImage" src="" alt="Processed Photobooth Strip" class="processed-image">
             <div class="result-actions">
-                <a id="downloadLink" href="#" download class="download-button">Download My Magic! <span class="download-icon">⬇️</span></a>
-                <button id="createAnother" class="create-another-button">Create Another! <span class="reset-icon">🔄</span></button>
+                <a id="downloadLink" href="#" download class="download-button animated-button">Download My Magic! <span class="download-icon">⬇️</span></a>
+                <button id="createAnother" class="create-another-button animated-button">Create Another! <span class="reset-icon">🔄</span></button>
             </div>
         </div>
 
@@ -122,12 +130,15 @@
     </div>
 
     <div id="loadingOverlay" class="loading-overlay hidden">
-        <div class="spinner">🌸</div>
+        <div class="loading-spinner-container">
+            <span class="loading-spinner-petal petal-1">🌸</span>
+            <span class="loading-spinner-petal petal-2">💖</span>
+            <span class="loading-spinner-petal petal-3">✨</span>
+            <span class="loading-spinner-petal petal-4">💫</span>
+        </div>
         <p>Conjuring your vintage memories...</p>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
-<!--http://127.0.0.1:5000-->

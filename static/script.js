@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadForm = document.getElementById('uploadForm');
     const dropArea = document.getElementById('dropArea');
     const photoUploadInput = document.getElementById('photoUpload');
+    const clickToSelectBtn = document.querySelector('.click-to-select-btn'); // New button
     const filePreviews = document.getElementById('filePreviews');
     const resultSection = document.getElementById('resultSection');
     const processedImage = document.getElementById('processedImage');
@@ -12,9 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let uploadedFiles = []; // Array to store files selected by user
 
-    // --- Drag & Drop Functionality ---
-    dropArea.addEventListener('click', () => photoUploadInput.click());
-
+    // --- Event Listeners ---
     dropArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropArea.classList.add('hover');
@@ -30,32 +29,65 @@ document.addEventListener('DOMContentLoaded', () => {
         handleFiles(e.dataTransfer.files);
     });
 
+    // Clicking the "Or click to select" button
+    clickToSelectBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent form submission if button is inside form
+        photoUploadInput.click();
+    });
+
+    // Directly clicking the dropArea itself will also trigger the input
+    // (This listener is for the overall dropArea, not just the button)
+    dropArea.addEventListener('click', (e) => {
+        // Only trigger if click is directly on dropArea or its children, but not the button itself
+        if (e.target === dropArea || !clickToSelectBtn.contains(e.target)) {
+            photoUploadInput.click();
+        }
+    });
+
     photoUploadInput.addEventListener('change', (e) => {
         handleFiles(e.target.files);
     });
 
+    uploadForm.addEventListener('submit', handleSubmit);
+    createAnotherButton.addEventListener('click', resetForm);
+
+
+    // --- File Handling Functions ---
     function handleFiles(files) {
         errorMessage.classList.add('hidden'); // Hide any previous error
-        const maxFiles = 4;
-        const currentFileCount = uploadedFiles.length;
-        const newFileCount = files.length;
 
-        if (currentFileCount + newFileCount > maxFiles) {
-            displayError(`You can upload a maximum of ${maxFiles} photos. Please remove some or upload fewer.`);
+        const filesArray = Array.from(files); // Convert FileList to Array
+
+        // Filter out existing files to prevent duplicates
+        const newValidFiles = filesArray.filter(file => 
+            file.type.startsWith('image/') && !uploadedFiles.some(existingFile => existingFile.name === file.name && existingFile.size === file.size)
+        );
+
+        const totalFilesAfterAdding = uploadedFiles.length + newValidFiles.length;
+
+        if (totalFilesAfterAdding > 4) {
+            displayError(`You can upload a maximum of 4 photos. You tried to add ${newValidFiles.length} new files, which would exceed the limit.`);
             return;
         }
 
-        for (const file of files) {
-            if (file.type.startsWith('image/') && uploadedFiles.length < maxFiles) {
-                uploadedFiles.push(file);
-                renderFilePreview(file);
-            } else if (!file.type.startsWith('image/')) {
-                displayError(`"${file.name}" is not a valid image file. Only JPG, PNG, GIF are allowed.`);
-            } else if (uploadedFiles.length >= maxFiles) {
-                 displayError(`Maximum of ${maxFiles} photos reached. "${file.name}" was not added.`);
+        if (newValidFiles.length === 0 && filesArray.length > 0) {
+            // This case handles attempts to re-upload existing files or invalid files
+            if (filesArray.some(file => !file.type.startsWith('image/'))) {
+                displayError("Some selected files were not valid image types (JPG, PNG, GIF).");
+            } else if (filesArray.every(file => uploadedFiles.some(existingFile => existingFile.name === file.name && existingFile.size === file.size))) {
+                 displayError("You've already added these photos. Please select new ones or proceed!");
             }
+            return;
         }
-        // Clear the input so selecting same files again triggers change event
+
+
+        uploadedFiles.push(...newValidFiles);
+        
+        newValidFiles.forEach(file => {
+            renderFilePreview(file);
+        });
+        
+        // Clear the input so selecting same files again triggers change event (important for 'change' listener)
         photoUploadInput.value = ''; 
     }
 
@@ -88,18 +120,21 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadedFiles = uploadedFiles.filter(file => file !== fileToRemove);
         filePreviews.removeChild(previewItem);
         errorMessage.classList.add('hidden'); // Clear error if files are removed
+        // If all files are removed, you might want to show a message or adjust UI
+        if (uploadedFiles.length === 0) {
+            // Optionally, change dropArea text back to initial state
+        }
     }
 
-    // --- Form Submission ---
-    uploadForm.addEventListener('submit', async (e) => {
+    // --- Form Submission Function ---
+    async function handleSubmit(e) {
         e.preventDefault();
 
         if (uploadedFiles.length === 0) {
             displayError('Please upload at least one photo to conjure your strip!');
             return;
         }
-
-        if (uploadedFiles.length > 4) {
+        if (uploadedFiles.length > 4) { // This should ideally be caught by handleFiles, but as a double-check
              displayError('You can upload a maximum of 4 photos.');
              return;
         }
@@ -140,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             hideLoading();
         }
-    });
+    }
 
     // --- UI State Management ---
     function showLoading() {
@@ -157,13 +192,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Reset Functionality ---
-    createAnotherButton.addEventListener('click', () => {
+    function resetForm() {
         uploadedFiles = [];
         filePreviews.innerHTML = ''; // Clear previews
         uploadForm.reset(); // Reset form radio buttons etc.
         resultSection.classList.add('hidden');
         uploadForm.classList.remove('hidden'); // Show form again
         errorMessage.classList.add('hidden'); // Hide any errors
-        photoUploadInput.value = ''; // Clear file input value
-    });
+        photoUploadInput.value = ''; // Clear file input value for security
+    }
 });
