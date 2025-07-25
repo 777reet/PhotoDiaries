@@ -9,6 +9,7 @@
     
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        /* This style block for confetti-piece can remain here or be moved to style.css */
         .confetti-piece {
             position: absolute;
             width: 10px;
@@ -40,17 +41,13 @@
             animation-timing-function: ease-in-out;
         }
 
-        /* Set random x-offset for confetti */
-        .confetti-piece {
-            --rand-x: calc(var(--index) / 100 * 2 - 1); /* Distributes them across x-axis */
-            left: calc(var(--index) * 1%); /* Adjust if needed */
-        }
+        /* The --rand-x variable is set dynamically by JavaScript for wider confetti spread */
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📸 Sabrina's Dream Booth 💖</h1>
-        <p class="subtitle">Upload 4 photos and let's create your perfect vintage strip! </p>
+        <p class="subtitle">Upload 1 to 4 photos and let's create your perfect vintage strip! </p>
 
         <div class="upload-area" id="uploadArea">
             <div class="upload-icon">✨</div>
@@ -77,8 +74,18 @@
                 <div class="radio-group">
                     <label><input type="radio" name="frame_style" value="classic" checked> Subtle Edge</label>
                     <label><input type="radio" name="frame_style" value="polaroid"> Polaroid Perfect</label>
+                    <label><input type="radio" name="frame_style" value="distressed"> Vintage Distressed</label> </div>
+            </div>
+
+            <div class="option-group">
+                <label>Add a Sprinkle of Magic:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="effect_filter" value="none" checked> None (Just Pretty!)</label>
+                    <label><input type="radio" name="effect_filter" value="glitter"> Glitter Overlay ✨</label>
+                    <label><input type="radio" name="effect_filter" value="bokeh"> Soft Bokeh Dream 🌸</label>
                 </div>
             </div>
+
         </div>
 
         <button class="process-btn" id="processBtn" disabled>Conjure My Strip! 🪄</button>
@@ -104,4 +111,3 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-<!--http://127.0.0.1:5000-->
