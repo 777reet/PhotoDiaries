@@ -1,19 +1,55 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const horizontalScrollContainer = document.querySelector('.horizontal-scroll-container');
     const uploadForm = document.getElementById('uploadForm');
     const dropArea = document.getElementById('dropArea');
     const photoUploadInput = document.getElementById('photoUpload');
-    const clickToSelectBtn = document.querySelector('.click-to-select-btn'); // New button
+    const clickToSelectBtn = document.querySelector('.click-to-select-btn');
     const filePreviews = document.getElementById('filePreviews');
-    const resultSection = document.getElementById('resultSection');
+    const resultSection = document.getElementById('resultPanel'); // This is now a panel
     const processedImage = document.getElementById('processedImage');
     const downloadLink = document.getElementById('downloadLink');
     const createAnotherButton = document.getElementById('createAnother');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const errorMessage = document.getElementById('errorMessage');
 
+    // Navigation Buttons
+    const goToOptionsButton = document.getElementById('goToOptions');
+    const goToWelcomeButton = document.getElementById('goToWelcome');
+    const goToOptionsFromResultButton = document.getElementById('goToOptionsFromResult'); // New button
+
     let uploadedFiles = []; // Array to store files selected by user
 
-    // --- Event Listeners ---
+    // --- Panel Navigation Functions ---
+    function scrollToPanel(panelId) {
+        const panel = document.getElementById(panelId);
+        if (panel) {
+            horizontalScrollContainer.scrollTo({
+                left: panel.offsetLeft,
+                behavior: 'smooth'
+            });
+            // Hide error message when navigating
+            errorMessage.classList.add('hidden');
+        }
+    }
+
+    goToOptionsButton.addEventListener('click', () => {
+        if (uploadedFiles.length === 0) {
+            displayError('Please upload at least one photo before choosing your magic!');
+            return;
+        }
+        scrollToPanel('optionsPanel');
+    });
+
+    goToWelcomeButton.addEventListener('click', () => {
+        scrollToPanel('welcomeUploadPanel');
+    });
+
+    goToOptionsFromResultButton.addEventListener('click', () => {
+        scrollToPanel('optionsPanel');
+    });
+
+
+    // --- File Handling Event Listeners ---
     dropArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         dropArea.classList.add('hover');
@@ -29,27 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
         handleFiles(e.dataTransfer.files);
     });
 
-    // Clicking the "Or click to select" button
-    clickToSelectBtn.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent form submission if button is inside form
+    clickToSelectBtn.addEventListener('click', () => {
         photoUploadInput.click();
-    });
-
-    // Directly clicking the dropArea itself will also trigger the input
-    // (This listener is for the overall dropArea, not just the button)
-    dropArea.addEventListener('click', (e) => {
-        // Only trigger if click is directly on dropArea or its children, but not the button itself
-        if (e.target === dropArea || !clickToSelectBtn.contains(e.target)) {
-            photoUploadInput.click();
-        }
     });
 
     photoUploadInput.addEventListener('change', (e) => {
         handleFiles(e.target.files);
     });
-
-    uploadForm.addEventListener('submit', handleSubmit);
-    createAnotherButton.addEventListener('click', resetForm);
 
 
     // --- File Handling Functions ---
@@ -58,8 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const filesArray = Array.from(files); // Convert FileList to Array
 
-        // Filter out existing files to prevent duplicates
-        const newValidFiles = filesArray.filter(file => 
+        const newValidFiles = filesArray.filter(file =>
             file.type.startsWith('image/') && !uploadedFiles.some(existingFile => existingFile.name === file.name && existingFile.size === file.size)
         );
 
@@ -71,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (newValidFiles.length === 0 && filesArray.length > 0) {
-            // This case handles attempts to re-upload existing files or invalid files
             if (filesArray.some(file => !file.type.startsWith('image/'))) {
                 displayError("Some selected files were not valid image types (JPG, PNG, GIF).");
             } else if (filesArray.every(file => uploadedFiles.some(existingFile => existingFile.name === file.name && existingFile.size === file.size))) {
@@ -80,15 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-
         uploadedFiles.push(...newValidFiles);
-        
+
         newValidFiles.forEach(file => {
             renderFilePreview(file);
         });
-        
-        // Clear the input so selecting same files again triggers change event (important for 'change' listener)
-        photoUploadInput.value = ''; 
+
+        photoUploadInput.value = '';
     }
 
     function renderFilePreview(file) {
@@ -96,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onload = (e) => {
             const previewItem = document.createElement('div');
             previewItem.classList.add('file-preview-item');
-            
+
             const img = document.createElement('img');
             img.src = e.target.result;
             img.alt = file.name;
@@ -106,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             removeButton.classList.add('remove-file');
             removeButton.textContent = 'X';
             removeButton.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent triggering dropArea click
+                event.stopPropagation();
                 removeFile(file, previewItem);
             });
             previewItem.appendChild(removeButton);
@@ -119,36 +137,35 @@ document.addEventListener('DOMContentLoaded', () => {
     function removeFile(fileToRemove, previewItem) {
         uploadedFiles = uploadedFiles.filter(file => file !== fileToRemove);
         filePreviews.removeChild(previewItem);
-        errorMessage.classList.add('hidden'); // Clear error if files are removed
-        // If all files are removed, you might want to show a message or adjust UI
-        if (uploadedFiles.length === 0) {
-            // Optionally, change dropArea text back to initial state
-        }
+        errorMessage.classList.add('hidden');
     }
 
     // --- Form Submission Function ---
+    uploadForm.addEventListener('submit', handleSubmit);
+
     async function handleSubmit(e) {
         e.preventDefault();
 
         if (uploadedFiles.length === 0) {
             displayError('Please upload at least one photo to conjure your strip!');
+            scrollToPanel('welcomeUploadPanel'); // Go back to upload panel
             return;
         }
-        if (uploadedFiles.length > 4) { // This should ideally be caught by handleFiles, but as a double-check
+        if (uploadedFiles.length > 4) {
              displayError('You can upload a maximum of 4 photos.');
+             scrollToPanel('welcomeUploadPanel');
              return;
         }
 
         showLoading();
         errorMessage.classList.add('hidden');
-        resultSection.classList.add('hidden'); // Hide previous result
+        // resultSection.classList.add('hidden'); // Not needed as it's a panel now
 
         const formData = new FormData();
         uploadedFiles.forEach(file => {
             formData.append('photos', file);
         });
 
-        // Append selected options
         formData.append('color_mode', document.querySelector('input[name="color_mode"]:checked').value);
         formData.append('frame_style', document.querySelector('input[name="frame_style"]:checked').value);
         formData.append('effect_filter', document.querySelector('input[name="effect_filter"]:checked').value);
@@ -164,17 +181,32 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 processedImage.src = data.image_url;
                 downloadLink.href = data.download_url;
-                resultSection.classList.remove('hidden');
-                uploadForm.classList.add('hidden'); // Hide form
+                scrollToPanel('resultPanel'); // Scroll to result panel
             } else {
                 displayError(data.error || 'An unknown error occurred.');
+                scrollToPanel('optionsPanel'); // Stay on options if error occurs
             }
         } catch (error) {
             console.error('Error:', error);
             displayError('Network error or server unavailable. Please try again later.');
+            scrollToPanel('optionsPanel'); // Stay on options if network error
         } finally {
             hideLoading();
         }
+    }
+
+    // --- Reset Functionality ---
+    createAnotherButton.addEventListener('click', resetForm);
+
+    function resetForm() {
+        uploadedFiles = [];
+        filePreviews.innerHTML = '';
+        uploadForm.reset();
+        processedImage.src = ''; // Clear image
+        downloadLink.href = '#'; // Clear download link
+        errorMessage.classList.add('hidden');
+        photoUploadInput.value = '';
+        scrollToPanel('welcomeUploadPanel'); // Go back to the first panel
     }
 
     // --- UI State Management ---
@@ -189,16 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayError(message) {
         errorMessage.textContent = message;
         errorMessage.classList.remove('hidden');
-    }
-
-    // --- Reset Functionality ---
-    function resetForm() {
-        uploadedFiles = [];
-        filePreviews.innerHTML = ''; // Clear previews
-        uploadForm.reset(); // Reset form radio buttons etc.
-        resultSection.classList.add('hidden');
-        uploadForm.classList.remove('hidden'); // Show form again
-        errorMessage.classList.add('hidden'); // Hide any errors
-        photoUploadInput.value = ''; // Clear file input value for security
+        // Auto-hide error after a few seconds
+        setTimeout(() => {
+            errorMessage.classList.add('hidden');
+        }, 5000);
     }
 });

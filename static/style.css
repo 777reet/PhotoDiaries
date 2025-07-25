@@ -1,385 +1,367 @@
 /* --- Global & Body Styling --- */
 @import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300;400;600&family=Parisienne&display=swap');
 
-body {
-    font-family: 'Poppins', sans-serif;
+html, body {
     margin: 0;
     padding: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #4A0E4F; /* Deep plum color */
-    overflow: hidden; /* Prevent scroll for animated background */
+    height: 100%; /* Ensure full viewport height */
+    width: 100%; /* Ensure full viewport width */
+    overflow: hidden; /* Hide default scrollbars */
+    font-family: 'Poppins', sans-serif;
+    color: #4A0E4F; /* Deep plum color for text */
     position: relative;
-    background: radial-gradient(circle at center, #fce4ec 0%, #e1bee7 70%, #d1c4e9 100%); /* Soft radial gradient */
+    /* Vintage Background - Muted Pastel with Subtle Pattern */
+    background-color: #f7f1e3; /* Muted cream/beige base */
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e9e1d3' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0-30V0H4v4H0v2h4v4h2V6H0V4h-4z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); /* Subtle faded pattern */
+    background-attachment: fixed; /* Keep pattern fixed while panels scroll */
+    background-size: 60px 60px; /* Size of the pattern squares */
 }
 
-/* --- Background Decorations --- */
-.background-decor {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none; /* Allow interaction with elements beneath */
-    overflow: hidden;
+
+/* --- Horizontal Scroll Container --- */
+.horizontal-scroll-container {
+    display: flex; /* Arrange panels horizontally */
+    flex-direction: row;
+    flex-wrap: nowrap; /* Prevent panels from wrapping */
+    overflow-x: scroll; /* Enable horizontal scrolling */
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    height: 100vh; /* Takes full viewport height */
+    width: 100vw; /* Takes full viewport width */
+    scroll-snap-type: x mandatory; /* Snaps to full panels */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    position: relative;
+    z-index: 1; /* Above any potential background layers */
+    /* Custom scrollbar styles */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
 }
 
-.decor-heart, .decor-sparkle, .decor-bubble {
-    position: absolute;
-    font-size: 3em;
-    opacity: 0.3;
-    animation: floatAndFade 20s infinite ease-in-out;
-    filter: blur(1px); /* Soft blur */
+.horizontal-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
-.decor-heart { color: #FFC0CB; /* Light Pink */ }
-.decor-sparkle { color: #FFD700; /* Gold */ }
-.decor-bubble { 
-    background-color: rgba(255, 255, 255, 0.4); 
-    border-radius: 50%;
-    width: 50px; height: 50px; 
-    font-size: 0; /* Hide text */
-    border: 1px solid rgba(255, 255, 255, 0.6);
+/* --- Individual Panels/Sections --- */
+.panel {
+    flex: 0 0 100vw; /* Each panel takes full viewport width */
+    height: 100vh; /* Each panel takes full viewport height */
+    scroll-snap-align: center; /* Snaps to center of panel */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    padding: 20px;
+    box-sizing: border-box; /* Include padding in width/height */
+    position: relative;
+    overflow: hidden; /* Hide content overflow within panel */
 }
 
-.decor-1 { top: 10%; left: 5%; animation-delay: 0s; transform: scale(0.8); }
-.decor-2 { top: 30%; right: 10%; animation-delay: 4s; transform: scale(1.1); }
-.decor-3 { bottom: 20%; left: 15%; animation-delay: 8s; transform: scale(0.9); }
-.decor-4 { top: 50%; left: 0%; animation-delay: 12s; transform: scale(1.2); }
-.decor-5 { bottom: 5%; right: 5%; animation-delay: 16s; transform: scale(0.7); }
-
-@keyframes floatAndFade {
-    0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.3; }
-    25% { transform: translateY(-50px) rotate(10deg) scale(1.05); opacity: 0.4; }
-    50% { transform: translateY(-100px) rotate(0deg) scale(1); opacity: 0.5; }
-    75% { transform: translateY(-150px) rotate(-10deg) scale(0.95); opacity: 0.2; }
-    100% { transform: translateY(-200px) rotate(0deg) scale(0.8); opacity: 0; }
-}
-
-/* --- Main Container --- */
-.photobooth-container {
-    background: linear-gradient(160deg, #ffffff 0%, #fffaf0 100%); /* Soft creamy white gradient */
-    border-radius: 40px; /* More pronounced rounded corners */
+.panel-content {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(250, 240, 245, 0.7)); /* Soft translucent background for content within panel */
     padding: 40px 30px;
-    box-shadow: 
-        0 15px 40px rgba(0, 0, 0, 0.15), /* Deeper main shadow */
-        0 0 0 15px rgba(255, 228, 225, 0.6), /* Ethereal blush halo */
-        0 0 0 20px rgba(240, 248, 255, 0.3); /* Fainter light blue aura */
-    max-width: 750px; /* Wider for more comfortable layout */
+    border-radius: 60px 30px 60px 30px; /* More organic, cloud-like shape */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1), 0 0 0 10px rgba(255, 228, 225, 0.4); /* Soft shadows */
+    max-width: 600px;
     width: 90%;
     text-align: center;
     position: relative;
     z-index: 2;
-    overflow: hidden; /* Ensure content stays within rounded corners */
-    animation: fadeInScale 1s ease-out; /* Gentle entry animation */
+    margin-top: 20px; /* Space from title */
 }
 
-@keyframes fadeInScale {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
 
-/* --- Header Section --- */
-.header-section {
-    margin-bottom: 35px;
+/* --- Specific Panel Styling (for unique colors/backgrounds) --- */
+.welcome-upload-panel {
+    background: radial-gradient(circle at top left, #f5eef5, #e0d0e0); /* Very subtle, muted pink-purple */
     position: relative;
-    padding-bottom: 20px; /* Space for tagline */
-    border-bottom: 2px dashed #FFD1DC; /* Delicate separator */
+}
+.options-panel {
+    background: radial-gradient(circle at bottom right, #eaf2f8, #c5dbe9); /* Very subtle, muted blue */
+    position: relative;
+}
+.result-panel {
+    background: radial-gradient(circle at top right, #f8f5e7, #e0d5c0); /* Very subtle, muted cream-yellow */
+    position: relative;
+}
+
+/* --- Header Section (Welcome Panel) --- */
+.header-section {
+    margin-bottom: 25px;
+    text-align: center;
+    z-index: 3; /* Ensure it's above panel content */
 }
 
 .header-section h1 {
-    font-family: 'Grand Hotel', cursive; /* Elegant script font */
-    font-size: 4.5em; /* Significantly larger title */
-    color: #8A2BE2; /* A lovely purple */
+    font-family: 'Grand Hotel', cursive;
+    font-size: 4.8em; /* Larger title */
+    color: #8A2BE2; /* Lovely purple */
     margin: 0;
     line-height: 1;
-    text-shadow: 3px 3px 8px rgba(0,0,0,0.15); /* More prominent shadow */
-    position: relative;
-    display: inline-block; /* To make camera icon absolute relative to it */
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
 }
 
-.camera-icon-text {
-    font-size: 0.7em; /* Smaller camera icon relative to text */
-    position: absolute;
-    top: -20px;
-    left: -30px; /* Adjust positioning */
-    transform: rotate(-15deg);
-    animation: floatBob 3s ease-in-out infinite alternate; /* Gentle floating animation */
-    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+.sparkling-icon {
+    font-size: 0.8em;
+    vertical-align: top;
+    animation: sparkleEffect 1.5s infinite alternate;
 }
 
-@keyframes floatBob {
-    0% { transform: translateY(0) rotate(-15deg); }
-    50% { transform: translateY(-8px) rotate(-10deg); }
-    100% { transform: translateY(0) rotate(-15deg); }
-}
-
-.sparkling-heart {
-    font-size: 3em; /* Larger, more noticeable heart */
-    margin-top: 15px;
-    display: block;
-    animation: pulseGlow 2s infinite alternate; /* Pulsating glow animation */
-    text-shadow: 0 0 10px #ffc0cb, 0 0 20px #ff69b4; /* Pink glow */
-}
-
-@keyframes pulseGlow {
-    from { transform: scale(1); text-shadow: 0 0 10px #ffc0cb; }
-    to { transform: scale(1.1); text-shadow: 0 0 15px #ff69b4, 0 0 25px #ff1493; }
+@keyframes sparkleEffect {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 .tagline {
-    font-family: 'Lora', serif; /* A more elegant serif for the tagline */
-    font-size: 1.3em;
-    color: #6a0dad; /* Darker purple for contrast */
-    margin-top: 20px;
-    position: relative;
-    /* We could add subtle text path animation or curve here with SVG/JS */
+    font-family: 'Lora', serif;
+    font-size: 1.4em;
+    color: #6a0dad;
+    margin-top: 10px;
 }
 
-/* --- Upload Area --- */
+/* --- Upload Area (Glowing Portal) --- */
 .upload-area {
-    border: 4px dashed #FFD1DC; /* Softer, thicker pink dashed border */
-    border-radius: 25px; /* Softer rounded corners */
-    padding: 50px 20px; /* More internal space */
-    background-color: #fff8f8; /* Very light pink background */
+    border: 3px solid rgba(255, 192, 203, 0.6); /* Soft pink border */
+    border-radius: 30px; /* Softer rounded corners */
+    padding: 50px 20px;
+    background-color: rgba(255, 248, 248, 0.9); /* Very light pink background */
     cursor: pointer;
-    transition: background-color 0.4s ease, border-color 0.4s ease;
-    margin-bottom: 40px;
+    transition: all 0.4s ease;
+    margin-bottom: 30px;
     position: relative;
-    overflow: hidden; /* For inner animations */
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08) inset; /* Soft inner shadow */
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.3), inset 0 0 8px rgba(255, 105, 180, 0.2); /* Initial subtle glow */
 }
 
 .upload-area:hover {
-    background-color: #ffe8ee; /* Slightly darker on hover */
-    border-color: #ffb6c1; /* Brighter pink on hover */
-    box-shadow: 0 5px 25px rgba(0,0,0,0.1) inset, 0 0 15px rgba(255,192,203,0.3); /* Enhanced glow on hover */
+    background-color: rgba(255, 230, 230, 0.95);
+    border-color: #FFB6C1;
+    box-shadow: 0 0 25px rgba(255, 105, 180, 0.6), inset 0 0 15px rgba(255, 105, 180, 0.4); /* Enhanced glow on hover */
 }
 
-.animated-star {
-    font-size: 5em; /* Larger, more central star */
-    color: #FFD700; /* Gold */
+.portal-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(circle, rgba(255, 105, 180, 0.5) 0%, rgba(255, 105, 180, 0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: portalPulse 3s infinite alternate ease-in-out;
+    z-index: 0; /* Behind content */
+}
+
+@keyframes portalPulse {
+    0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+.upload-icon {
+    font-size: 4em;
+    color: #9370DB;
     display: block;
-    margin-bottom: 20px;
-    animation: rotateAndSparkle 4s infinite linear; /* Continuous rotation and sparkle */
-    text-shadow: 0 0 15px rgba(255,215,0,0.5), 0 0 25px rgba(255,215,0,0.3); /* Gold glow */
-}
-
-@keyframes rotateAndSparkle {
-    0% { transform: rotate(0deg) scale(1); opacity: 1; }
-    25% { transform: rotate(90deg) scale(1.05); opacity: 0.9; }
-    50% { transform: rotate(180deg) scale(1.1); opacity: 1; }
-    75% { transform: rotate(270deg) scale(1.05); opacity: 0.9; }
-    100% { transform: rotate(360deg) scale(1); opacity: 1; }
+    margin-bottom: 15px;
+    position: relative; /* Above glow */
+    z-index: 1;
 }
 
 .drag-text {
-    font-size: 1.3em;
+    font-size: 1.2em;
     font-weight: 500;
     color: #4A0E4F;
     margin: 10px 0;
-}
-
-.click-to-select-btn {
-    background: none;
-    border: none;
-    color: #9370DB; /* Medium purple */
-    font-size: 1.1em;
-    font-style: italic;
-    text-decoration: underline;
-    cursor: pointer;
-    margin-top: 5px;
-    transition: color 0.3s ease;
-}
-
-.click-to-select-btn:hover {
-    color: #6A0DAD; /* Darker purple on hover */
+    position: relative;
+    z-index: 1;
 }
 
 .file-info {
-    font-size: 0.85em;
+    font-size: 0.8em;
     color: #A9A9A9;
     margin-top: 15px;
+    position: relative;
+    z-index: 1;
 }
 
 .file-previews {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px;
-    margin-top: 25px;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .file-preview-item {
     position: relative;
-    width: 90px;
-    height: 90px;
-    border: 3px solid #FFC0CB; /* Pink border */
-    border-radius: 15px; /* Softer corners */
+    width: 80px;
+    height: 80px;
+    border: 2px solid #FFC0CB;
+    border-radius: 12px;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
 }
 
 .file-preview-item:hover {
-    transform: translateY(-5px) rotate(2deg); /* Playful lift and rotate on hover */
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    transform: translateY(-3px) rotate(1deg);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .file-preview-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: brightness(0.95); /* Slightly muted */
+    filter: brightness(0.95);
 }
 
 .file-preview-item .remove-file {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background-color: #FF69B4; /* Hot pink */
+    top: -5px;
+    right: -5px;
+    background-color: #FF69B4;
     color: white;
     border-radius: 50%;
-    width: 25px;
-    height: 25px;
+    width: 22px;
+    height: 22px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 0.9em;
+    font-size: 0.8em;
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
-    border: 2px solid white; /* White border for pop */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border: 1px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
-
 .file-preview-item .remove-file:hover {
-    background-color: #CD5C5C; /* Red on hover */
+    background-color: #CD5C5C;
     transform: scale(1.1);
 }
 
-/* --- Options Section --- */
-.options-section {
-    margin-bottom: 40px;
+/* --- Panel Titles --- */
+.panel-title {
+    font-family: 'Lora', serif;
+    font-size: 2.5em;
+    color: #8A2BE2;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.05);
 }
 
+/* --- Option Group Styling --- */
 .option-group {
-    border: 2px solid #FFD1DC; /* Light pink border */
-    border-radius: 20px; /* More rounded */
-    padding: 25px;
-    margin-bottom: 30px;
-    background: linear-gradient(135deg, #fffaf0, #fff0f5); /* Soft gradient background for group */
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08); /* Soft group shadow */
+    border: none; /* No border for the fieldset */
+    padding: 0;
+    margin-bottom: 25px;
+    background: none;
+    box-shadow: none;
 }
 
 .option-group legend {
-    font-family: 'Lora', serif; /* Elegant serif for legends */
-    font-size: 1.5em; /* Larger legend text */
+    font-family: 'Lora', serif;
+    font-size: 1.6em;
     font-weight: 600;
-    color: #8A2BE2; /* Purple heading */
-    padding: 0 15px;
-    text-align: center; /* Center legend */
-    background-color: #fff; /* White background for legend text */
-    border-radius: 10px;
-    position: relative;
-    top: -35px; /* Position legend outside the border */
-    display: inline-block;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    color: #6a0dad;
+    padding: 0 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    display: block; /* Ensure it takes full width for centering */
+    text-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .option-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px; /* Increased gap between cards */
-    margin-top: -15px; /* Pull options up towards the legend */
+    gap: 15px;
 }
 
-.option-card {
-    display: block;
-    background-color: #FFD1DC; /* Soft pink card background */
-    border-radius: 20px; /* More rounded pill shape */
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.4s ease;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12); /* Softer shadow */
-    width: calc(33% - 40px); /* For 3 items per row, accounting for gap */
-    min-width: 180px; /* Slightly larger min-width */
+/* --- Option Charms/Lockers --- */
+.option-charm {
     display: flex;
-    flex-direction: column; /* Stack content */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
+    background: linear-gradient(135deg, #fff0f5, #f5e0e9); /* Soft gradient for charm */
+    border-radius: 50%; /* Circular charm */
+    width: 100px; /* Size of charm */
+    height: 100px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1), inset 0 0 5px rgba(255, 255, 255, 0.8); /* Floating effect */
     position: relative;
-    border: 2px solid transparent; /* For selected state outline */
+    border: 3px solid transparent; /* For selected state */
+    padding: 10px;
+    box-sizing: border-box;
 }
 
-.option-card input[type="radio"] {
+.option-charm input[type="radio"] {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-.option-card .card-content {
+.option-charm .charm-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
     color: #4A0E4F;
     font-weight: 500;
-    font-size: 1.05em; /* Slightly larger text */
+    font-size: 0.9em;
     transition: color 0.3s ease;
 }
 
-.option-card .card-icon {
-    font-size: 2.2em; /* Larger icons */
+.option-charm .charm-icon {
+    font-size: 2.5em; /* Larger icons */
     transition: transform 0.3s ease;
 }
 
-.option-card:hover {
-    background: linear-gradient(135deg, #FFB6C1, #FFD1DC); /* Gentle gradient on hover */
-    transform: translateY(-8px); /* More pronounced lift effect */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+.option-charm .charm-text {
+    white-space: normal; /* Allow text to wrap if needed */
+    text-align: center;
 }
 
-.option-card input[type="radio"]:checked + .card-content {
-    color: #FFFFFF; /* White text when selected */
-    font-weight: 600;
+.option-charm:hover {
+    background: linear-gradient(135deg, #FFB6C1, #FFD1DC);
+    transform: translateY(-5px); /* Gentle lift on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.option-card input[type="radio"]:checked + .card-content .card-icon {
-    transform: scale(1.2); /* Icon pops when selected */
+.option-charm input[type="radio"]:checked {
+    border-color: #9370DB; /* Purple border on selection */
+    background: linear-gradient(45deg, #9370DB, #8A2BE2); /* Darker purple gradient on selection */
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.5); /* Glowing effect */
 }
 
-.option-card input[type="radio"]:checked {
-    border-color: #8A2BE2; /* Highlight border on selection */
-    background: linear-gradient(45deg, #8A2BE2, #9370DB); /* Gradient background on selection */
-    box-shadow: 0 0 20px rgba(138, 43, 226, 0.6); /* Stronger glow on selection */
+.option-charm input[type="radio"]:checked + .charm-content {
+    color: white; /* White text when selected */
+    transform: scale(1.05); /* Slight pop of content */
 }
 
-.option-card input[type="radio"]:checked + .card-content::after {
-    content: '✓'; /* Checkmark icon */
+.option-charm input[type="radio"]:checked + .charm-content .charm-icon {
+    transform: scale(1.1); /* Icon pops when selected */
+}
+
+.option-charm input[type="radio"]:checked + .charm-content::after {
+    content: '✓'; /* Checkmark */
     position: absolute;
-    top: 8px;
-    right: 8px;
-    background-color: #8A2BE2; /* Purple checkmark background */
+    top: 5px;
+    right: 5px;
+    background-color: #8A2BE2;
     color: white;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.1em;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-    transform: scale(0); /* Start hidden */
-    animation: popIn 0.3s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Pop in animation */
+    font-size: 0.8em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transform: scale(0);
+    animation: popIn 0.3s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
 @keyframes popIn {
@@ -387,83 +369,74 @@ body {
     to { transform: scale(1); opacity: 1; }
 }
 
-
-/* --- Animated Buttons (Shared Styles) --- */
-.animated-button {
+/* --- Bloom Buttons (Shared Style) --- */
+.bloom-button {
     background: linear-gradient(45deg, #FF69B4, #9370DB); /* Pink to purple gradient */
     color: white;
     border: none;
     border-radius: 50px; /* Pill shape */
-    padding: 18px 35px; /* Larger padding */
-    font-size: 1.4em; /* Larger font */
+    padding: 15px 30px;
+    font-size: 1.1em;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.4s ease;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* Deeper shadow */
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Soft shadow */
     display: inline-flex;
     align-items: center;
-    gap: 12px; /* More space */
+    gap: 8px;
     text-transform: uppercase;
-    letter-spacing: 1.5px; /* More spaced out text */
+    letter-spacing: 0.5px;
     text-decoration: none; /* For download link */
     background-size: 200% 200%; /* For animating gradient position */
-    animation: gradientShift 5s ease infinite alternate; /* Continuous gradient animation */
+    animation: gradientBloom 4s ease infinite alternate; /* Gentle gradient animation */
 }
 
-@keyframes gradientShift {
+@keyframes gradientBloom {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-.animated-button:hover {
-    transform: translateY(-8px); /* More pronounced lift effect */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35); /* Even deeper shadow */
-    animation: gradientShift 3s ease infinite alternate, pulseButton 1s infinite alternate; /* Faster gradient + pulse */
+.bloom-button:hover {
+    transform: translateY(-3px); /* Gentle lift on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Deeper shadow on hover */
+    animation: gradientBloom 2s ease infinite alternate, pulseButton 0.8s infinite alternate; /* Faster gradient + pulse */
 }
 
 @keyframes pulseButton {
-    from { transform: translateY(-8px) scale(1); }
-    to { transform: translateY(-10px) scale(1.02); }
+    from { transform: translateY(-3px) scale(1); }
+    to { transform: translateY(-5px) scale(1.01); }
 }
 
-.sparkle-icon {
-    font-size: 1.3em;
-    animation: sparkleEffect 1.5s infinite alternate; /* More dynamic sparkle */
+/* Specific button positioning */
+.nav-button {
+    margin-top: 30px;
+    padding: 12px 25px;
+    font-size: 1em;
+}
+.nav-button-prev {
+    margin-top: 20px; /* Adjust if needed to not conflict with content */
+}
+.nav-arrow {
+    font-size: 1.2em;
+    margin-top: -2px; /* Fine-tune vertical alignment */
 }
 
-@keyframes sparkleEffect {
-    0% { transform: scale(1) rotate(0deg); opacity: 1; text-shadow: none; }
-    50% { transform: scale(1.3) rotate(30deg); opacity: 0.8; text-shadow: 0 0 8px gold; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; text-shadow: none; }
+.submit-button {
+    margin-top: 40px;
 }
-
 
 /* --- Result Section --- */
-.result-section {
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 3px dashed #FFD1DC; /* Thicker, more prominent separator */
-}
-
-.result-message {
-    font-family: 'Lora', serif;
-    font-size: 1.6em; /* Larger, more inviting message */
-    color: #8A2BE2;
-    margin-bottom: 30px;
-    text-shadow: 1px 1px 5px rgba(0,0,0,0.05);
-}
-
 .processed-image {
-    max-width: 100%;
+    max-width: 90%; /* Adjust size */
     height: auto;
-    border-radius: 20px; /* Softer edges */
+    border-radius: 25px; /* Softer edges */
     box-shadow: 
-        0 15px 40px rgba(0, 0, 0, 0.25), /* Deep shadow */
-        0 0 0 8px #FFD1DC, /* Pink border/glow */
-        0 0 0 12px rgba(255, 228, 225, 0.5); /* Fainter blush halo */
-    margin-bottom: 35px;
-    transition: transform 0.5s ease-out; /* Smooth entry */
+        0 10px 30px rgba(0, 0, 0, 0.2), /* Deep shadow */
+        0 0 0 5px #FFD1DC, /* Pink border/glow */
+        0 0 0 10px rgba(255, 228, 225, 0.3); /* Fainter blush halo */
+    margin-bottom: 30px;
+    transition: transform 0.5s ease-out;
     animation: popInImage 0.8s ease-out;
 }
 
@@ -475,31 +448,30 @@ body {
 .result-actions {
     display: flex;
     justify-content: center;
-    gap: 25px; /* Increased gap */
-}
-
-/* Download and Create Another buttons inherit animated-button styles */
-.download-icon, .reset-icon {
-    font-size: 1.1em;
+    gap: 20px;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
 }
 
 /* --- Error Message --- */
 .error-message {
-    background-color: #fce4ec; /* Lighter pink for error */
-    color: #d84315; /* Orange-red for error text */
-    border: 2px solid #ffab91; /* Soft orange border */
+    position: fixed; /* Fixed position so it stays visible */
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffe0b2; /* Soft orange for error */
+    color: #d84315;
+    border: 1px solid #ffab91;
     border-radius: 15px;
-    padding: 20px;
-    margin-top: 30px;
+    padding: 15px 25px;
     font-weight: 500;
     box-shadow: 0 5px 15px rgba(255, 100, 100, 0.2);
-    animation: shake 0.5s ease-in-out; /* Gentle shake for error */
+    z-index: 1000;
+    animation: fadeInDown 0.5s ease-out;
 }
 
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* --- Loading Overlay --- */
@@ -509,13 +481,13 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at center, rgba(255, 240, 245, 0.9) 0%, rgba(220, 230, 250, 0.8) 100%); /* Dreamy gradient overlay */
+    background: radial-gradient(circle at center, rgba(255, 240, 245, 0.9) 0%, rgba(220, 230, 250, 0.8) 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(8px); /* Stronger blur effect */
+    z-index: 2000; /* Higher than error message */
+    backdrop-filter: blur(5px);
     animation: fadeIn 0.5s ease-out;
 }
 
@@ -526,9 +498,9 @@ body {
 
 .loading-spinner-container {
     position: relative;
-    width: 100px; /* Adjust size of spinner area */
-    height: 100px;
-    margin-bottom: 30px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 25px;
 }
 
 .loading-spinner-petal {
@@ -536,39 +508,37 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 3.5em; /* Size of individual elements */
+    font-size: 3em;
     opacity: 0;
-    animation: petalDance 4s infinite ease-in-out forwards;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    animation: petalDance 3s infinite ease-in-out forwards; /* Faster animation */
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
 }
 
 .petal-1 { animation-delay: 0s; }
-.petal-2 { animation-delay: 1s; }
-.petal-3 { animation-delay: 2s; }
-.petal-4 { animation-delay: 3s; }
+.petal-2 { animation-delay: 0.75s; }
+.petal-3 { animation-delay: 1.5s; }
+.petal-4 { animation-delay: 2.25s; }
 
 @keyframes petalDance {
     0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
-    20% { transform: translate(-50%, -50%) scale(1.2) rotate(72deg); opacity: 1; }
-    40% { transform: translate(-50%, -50%) scale(1) rotate(144deg); opacity: 0.8; }
-    60% { transform: translate(-50%, -50%) scale(0.8) rotate(216deg); opacity: 0.6; }
-    80% { transform: translate(-50%, -50%) scale(0.5) rotate(288deg); opacity: 0.3; }
+    25% { transform: translate(-50%, -50%) scale(1.1) rotate(90deg); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1) rotate(180deg); opacity: 0.8; }
+    75% { transform: translate(-50%, -50%) scale(0.7) rotate(270deg); opacity: 0.4; }
     100% { transform: translate(-50%, -50%) scale(0) rotate(360deg); opacity: 0; }
 }
 
-
 .loading-overlay p {
-    font-family: 'Parisienne', cursive; /* Elegant cursive font for loading text */
-    font-size: 2em; /* Larger loading text */
+    font-family: 'Parisienne', cursive;
+    font-size: 1.8em;
     color: #6a0dad;
     font-weight: 400;
-    animation: fadeInOutText 3s infinite alternate; /* Pulsating text effect */
+    animation: fadeInOutText 2.5s infinite alternate;
 }
 
 @keyframes fadeInOutText {
-    0% { opacity: 0.6; transform: translateY(0); }
-    50% { opacity: 1; transform: translateY(-5px); }
-    100% { opacity: 0.6; transform: translateY(0); }
+    0% { opacity: 0.5; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-3px); }
+    100% { opacity: 0.5; transform: translateY(0); }
 }
 
 /* --- Utility Classes --- */
@@ -578,78 +548,84 @@ body {
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
-    .photobooth-container {
-        padding: 30px 20px;
-        border-radius: 30px;
-    }
-
     .header-section h1 {
         font-size: 3.5em;
     }
-
-    .camera-icon-text {
-        font-size: 0.6em;
-        top: -15px;
-        left: -20px;
-    }
-
-    .sparkling-heart {
-        font-size: 2.5em;
-    }
-
     .tagline {
         font-size: 1.1em;
     }
-
-    .upload-area {
-        padding: 40px 15px;
+    .panel-content {
+        padding: 30px 20px;
+        border-radius: 40px 20px 40px 20px;
     }
-
-    .animated-star {
-        font-size: 4em;
+    .upload-icon {
+        font-size: 3em;
     }
-
     .drag-text {
-        font-size: 1.1em;
+        font-size: 1em;
     }
-
+    .click-to-select-btn, .bloom-button, .submit-button, .download-button, .create-another-button {
+        font-size: 1em;
+        padding: 12px 20px;
+    }
+    .panel-title {
+        font-size: 2em;
+    }
+    .option-charm {
+        width: 80px;
+        height: 80px;
+        font-size: 0.8em;
+    }
+    .option-charm .charm-icon {
+        font-size: 2em;
+    }
     .option-group legend {
-        font-size: 1.3em;
-        top: -25px;
+        font-size: 1.4em;
     }
-
-    .option-row {
-        flex-direction: column; /* Stack options on smaller screens */
-        align-items: center;
-    }
-
-    .option-card {
-        width: 90%; /* Wider cards when stacked */
-        min-width: unset;
-        padding: 15px;
-    }
-    .option-card .card-icon {
-        font-size: 1.8em;
-    }
-    .option-card .card-content {
-        font-size: 0.95em;
-    }
-
-    .animated-button {
-        font-size: 1.2em;
-        padding: 15px 25px;
-    }
-
-    .result-message {
-        font-size: 1.3em;
-    }
-
     .result-actions {
         flex-direction: column;
         gap: 15px;
     }
+    .nav-button {
+        font-size: 0.9em;
+        padding: 10px 20px;
+    }
+}
 
-    .loading-overlay p {
-        font-size: 1.5em;
+@media (max-width: 480px) {
+    .header-section h1 {
+        font-size: 2.8em;
+    }
+    .tagline {
+        font-size: 1em;
+    }
+    .panel-content {
+        padding: 20px 15px;
+    }
+    .upload-icon {
+        font-size: 2.5em;
+    }
+    .drag-text {
+        font-size: 0.9em;
+    }
+    .file-info {
+        font-size: 0.7em;
+    }
+    .click-to-select-btn {
+        font-size: 0.9em;
+        padding: 10px 15px;
+    }
+    .option-charm {
+        width: 70px;
+        height: 70px;
+    }
+    .option-charm .charm-icon {
+        font-size: 1.8em;
+    }
+    .option-charm .charm-text {
+        font-size: 0.75em;
+    }
+    .option-group legend {
+        font-size: 1.2em;
     }
 }
