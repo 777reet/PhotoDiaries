@@ -2,15 +2,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Montserrat:wght@400;700&display=swap');
 
 :root {
-    --primary-color: #A765A2; /* Muted Purple */
-    --secondary-color: #EE87B4; /* Soft Pink */
-    --accent-color: #F8D8C0; /* Cream/Peach */
-    --text-color: #4A0E4F; /* Dark Plum */
-    --bg-gradient-start: #fce4ec; /* Light Pink */
-    --bg-gradient-end: #e1bee7; /* Light Purple */
-    --container-bg: #FFFFFF; /* White */
-    --shadow-color: rgba(0, 0, 0, 0.15);
-    --border-color: #E0BBE4; /* Light Lavender */
+    --primary-color: #C78CC7; /* Dusty Rose */
+    --secondary-color: #FFB3D9; /* Blush Pink */
+    --accent-color: #FFE0F0; /* Pale Lavender-Pink */
+    --text-color: #6A3B6A; /* Deep Plum */
+    --bg-gradient-start: #FCEFF9; /* Very Light Pink */
+    --bg-gradient-end: #EAD7F1; /* Soft Lilac */
+    --container-bg: #FFFFFF; /* Crisp White */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Softer Shadow */
+    --border-color: #F0CCEE; /* Delicate Rose Border */
 }
 
 * {
@@ -20,7 +20,6 @@
 }
 
 body {
-    /* Use Montserrat for general body text */
     font-family: 'Montserrat', sans-serif;
     background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     min-height: 100vh;
@@ -30,86 +29,84 @@ body {
     padding: 20px;
     color: var(--text-color);
     line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll from confetti */
 }
 
 .container {
     background: var(--container-bg);
-    border-radius: 25px;
-    padding: 50px;
-    box-shadow: 0 25px 50px var(--shadow-color);
-    max-width: 700px; /* Slightly wider */
+    border-radius: 30px; /* More rounded */
+    padding: 60px; /* More space */
+    box-shadow: 0 20px 40px var(--shadow-color); /* Softer, larger shadow */
+    max-width: 800px; /* Wider container */
     width: 100%;
     text-align: center;
     border: 2px solid var(--border-color); /* Subtle border */
+    position: relative; /* For image overlays */
+    overflow: hidden; /* Ensure content stays within bounds */
 }
 
 h1 {
     color: var(--primary-color);
-    margin-bottom: 15px;
-    font-size: 3.5em; /* Larger for Grand Hotel */
-    font-weight: 400; /* Grand Hotel usually has one weight */
-    letter-spacing: 1px;
-    /* Use Grand Hotel for the main title */
+    margin-bottom: 20px; /* More space below title */
+    font-size: 4em; /* Even larger, more prominent */
+    font-weight: 400;
+    letter-spacing: 2px; /* More elegant spacing */
     font-family: 'Grand Hotel', cursive;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.08); /* More defined shadow */
 }
 
 .subtitle {
     color: var(--text-color);
-    margin-bottom: 40px;
-    font-size: 1.2em;
+    margin-bottom: 50px; /* More space before upload */
+    font-size: 1.3em;
     font-style: italic;
-    /* Montserrat for subtitle */
     font-family: 'Montserrat', sans-serif;
 }
 
 .upload-area {
     border: 3px dashed var(--border-color);
-    border-radius: 20px;
-    padding: 50px;
-    margin: 30px 0;
-    background: var(--accent-color); /* Soft background */
-    transition: all 0.3s ease;
+    border-radius: 25px; /* Softer edges */
+    padding: 60px; /* More space inside */
+    margin: 40px 0; /* More vertical space */
+    background: var(--accent-color);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
     cursor: pointer;
-    position: relative; /* For the "glitter" effect */
+    position: relative;
     overflow: hidden;
 }
 
 .upload-area:hover {
     border-color: var(--primary-color);
-    /* For lighter color, use a fixed color or adjust with a CSS function like color-mix in newer CSS */
-    background: #FFEDD5; /* A slightly lighter cream/peach */
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    background: #FFF5FA; /* Lighter, more ethereal background on hover */
+    transform: translateY(-8px); /* Lift more dramatically */
+    box-shadow: 0 18px 30px rgba(0,0,0,0.15); /* More pronounced shadow */
 }
 
 .upload-area.dragover {
     border-color: var(--primary-color);
-    background: #FFDCB3; /* Even lighter */
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    background: #FFEDF7; /* Even lighter */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
 }
 
 .upload-icon {
-    font-size: 3.5em; /* Larger icon */
+    font-size: 4em; /* Larger, more inviting icon */
     color: var(--primary-color);
-    margin-bottom: 25px;
-    animation: bounceIn 1s ease-out; /* Fun animation */
+    margin-bottom: 30px;
+    animation: bounceIn 1s ease-out;
 }
 
 .upload-text {
-    font-size: 1.4em;
+    font-size: 1.6em; /* Larger, clearer text */
     color: var(--text-color);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     font-weight: 700;
-    /* Montserrat for upload text */
     font-family: 'Montserrat', sans-serif;
 }
 
 .upload-subtext {
-    font-size: 1em;
+    font-size: 1.1em; /* Slightly larger subtext */
     color: var(--primary-color);
-    opacity: 0.8;
-    /* Montserrat for upload subtext */
+    opacity: 0.9;
     font-family: 'Montserrat', sans-serif;
 }
 
@@ -118,40 +115,40 @@ h1 {
 }
 
 .file-list {
-    margin: 25px 0;
+    margin: 30px 0; /* More space */
     text-align: left;
-    max-height: 180px; /* Limit height and add scroll if many files (though limited to 4) */
+    max-height: 200px; /* Slightly more height */
     overflow-y: auto;
+    padding-right: 10px; /* For scrollbar spacing */
 }
 
 .file-item {
     display: flex;
     align-items: center;
-    padding: 12px 15px;
-    margin: 8px 0;
-    background: #fdf5f6; /* Very light pink */
-    border-radius: 12px;
-    font-size: 1em;
+    padding: 15px 20px; /* More padding */
+    margin: 10px 0; /* More spacing between items */
+    background: #fdfafd; /* Very light, almost white pink */
+    border-radius: 15px; /* More rounded */
+    font-size: 1.1em;
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease;
-    /* Montserrat for file item text */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06); /* Softer shadow */
+    transition: transform 0.3s ease;
     font-family: 'Montserrat', sans-serif;
 }
 
 .file-item:hover {
-    transform: translateX(5px);
+    transform: translateX(8px); /* More pronounced slide */
 }
 
-.file-item span:first-child { /* Icon */
-    font-size: 1.5em;
-    margin-right: 10px;
+.file-item span:first-child {
+    font-size: 1.8em; /* Larger icon */
+    margin-right: 15px;
     color: var(--primary-color);
 }
 
 .file-item .filename {
     flex: 1;
-    margin-right: 15px;
+    margin-right: 20px;
     color: var(--text-color);
     white-space: nowrap;
     overflow: hidden;
@@ -163,30 +160,32 @@ h1 {
     color: white;
     border: none;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 32px; /* Larger button */
+    height: 32px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px; /* Larger font */
     font-weight: bold;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .file-item .remove-btn:hover {
-    background: #ff6b81; /* Brighter pink */
-    transform: scale(1.1);
+    background: #FF85C1; /* Brighter pink */
+    transform: scale(1.2) rotate(15deg); /* More playful transform */
 }
 
 .options {
-    margin: 30px 0;
+    margin: 40px 0;
     text-align: left;
-    padding: 15px;
+    padding: 25px; /* More padding */
     border: 1px solid var(--border-color);
-    border-radius: 15px;
-    background: #fff8f9; /* Off-white pink */
+    border-radius: 20px; /* More rounded */
+    background: #fffafa; /* Off-white pink */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.03); /* Subtle inner shadow */
 }
 
 .option-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px; /* More space */
 }
 
 .option-group:last-child {
@@ -195,82 +194,86 @@ h1 {
 
 .option-group label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-weight: bold;
     color: var(--primary-color);
-    font-size: 1.1em;
-    /* Montserrat for option group labels */
+    font-size: 1.2em; /* Larger label */
     font-family: 'Montserrat', sans-serif;
 }
 
 .radio-group, .select-group {
     display: flex;
-    gap: 25px; /* More spacing */
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 30px; /* More spacing */
+    flex-wrap: wrap;
+    justify-content: center; /* Center options */
 }
 
 .radio-group input[type="radio"] {
-    margin-right: 8px;
-    accent-color: var(--primary-color); /* Highlight color */
+    margin-right: 10px;
+    accent-color: var(--primary-color);
+    transform: scale(1.2); /* Slightly larger radio buttons */
 }
 
 .radio-group label {
-    font-weight: normal; /* Labels are not bold here */
+    font-weight: normal;
     color: var(--text-color);
     cursor: pointer;
     display: flex;
     align-items: center;
-    /* Montserrat for radio group labels */
     font-family: 'Montserrat', sans-serif;
+    transition: color 0.2s ease;
+}
+
+.radio-group label:hover {
+    color: var(--secondary-color); /* Highlight text on hover */
 }
 
 .process-btn {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border: none;
-    padding: 18px 35px;
-    font-size: 1.2em;
-    border-radius: 30px;
+    padding: 20px 40px; /* Larger padding */
+    font-size: 1.3em; /* Larger font */
+    border-radius: 35px; /* More rounded */
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth transition */
-    margin-top: 25px;
-    font-weight: 700; /* Make it bold */
-    letter-spacing: 0.5px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    /* Montserrat for process button */
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncier transition */
+    margin-top: 30px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     font-family: 'Montserrat', sans-serif;
 }
 
 .process-btn:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 25px var(--shadow-color);
+    transform: translateY(-8px) scale(1.03); /* More pronounced lift */
+    box-shadow: 0 18px 30px var(--shadow-color);
 }
 
 .process-btn:disabled {
-    background: #ccc;
+    background: #E0E0E0; /* Lighter disabled color */
+    color: #9E9E9E; /* Greyer text */
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 .loading {
     display: none;
-    margin-top: 30px;
+    margin-top: 40px;
     color: var(--primary-color);
-    font-size: 1.1em;
-    /* Montserrat for loading text */
+    font-size: 1.2em;
     font-family: 'Montserrat', sans-serif;
 }
 
 .loading-spinner {
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid var(--primary-color);
+    border: 6px solid #f3f3f3; /* Thicker spinner */
+    border-top: 6px solid var(--primary-color);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 60px; /* Larger spinner */
+    height: 60px;
     animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
+    margin: 0 auto 25px;
 }
 
 @keyframes spin {
@@ -286,47 +289,45 @@ h1 {
 
 .result {
     display: none;
-    margin-top: 40px;
-    padding: 20px;
-    background: #fcf6f9; /* Lighter pink */
-    border-radius: 20px;
-    border: 1px dashed var(--secondary-color);
-    box-shadow: inset 0 0 15px rgba(255, 105, 180, 0.1); /* Inner shadow for glow */
+    margin-top: 50px; /* More space */
+    padding: 30px; /* More padding */
+    background: #fdf8fb; /* Lighter pink */
+    border-radius: 25px; /* More rounded */
+    border: 2px dashed var(--secondary-color); /* Thicker dashed border */
+    box-shadow: inset 0 0 20px rgba(255, 105, 180, 0.15); /* More prominent inner glow */
 }
 
 .result h3 {
     color: var(--primary-color);
-    font-size: 1.8em;
-    margin-bottom: 25px;
-    /* Montserrat for result heading */
+    font-size: 2em; /* Larger heading */
+    margin-bottom: 30px;
     font-family: 'Montserrat', sans-serif;
 }
 
 .result-image {
-    max-width: 90%; /* Slightly smaller for a nice border */
+    max-width: 95%; /* Almost full width for the strip */
     height: auto;
-    border-radius: 15px;
-    box-shadow: 0 12px 35px var(--shadow-color);
-    margin: 25px auto;
-    border: 5px solid var(--accent-color); /* Thicker frame */
-    display: block; /* Center the image */
+    border-radius: 20px; /* Softer corners */
+    box-shadow: 0 15px 40px var(--shadow-color); /* More significant shadow */
+    margin: 30px auto;
+    border: 8px solid var(--accent-color); /* Thicker, more decorative frame */
+    display: block;
 }
 
 .download-btn {
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 15px 30px;
-    font-size: 1.1em;
-    border-radius: 25px;
+    padding: 18px 35px; /* Larger padding */
+    font-size: 1.2em; /* Larger font */
+    border-radius: 30px; /* More rounded */
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
-    margin: 15px 10px;
-    transition: all 0.3s ease;
+    margin: 20px 15px; /* More spacing between buttons */
+    transition: all 0.4s ease;
     font-weight: bold;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-    /* Montserrat for download button */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     font-family: 'Montserrat', sans-serif;
 }
 
@@ -336,108 +337,196 @@ h1 {
 
 .download-btn:hover {
     background: var(--text-color); /* Darker on hover */
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    transform: translateY(-5px) scale(1.02); /* More pronounced lift */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 .error {
-    color: #d32f2f; /* Darker red */
-    margin-top: 20px;
-    padding: 12px 20px;
-    background: #ffebee; /* Light red background */
-    border-radius: 10px;
+    color: #E53935; /* Brighter red */
+    margin-top: 25px;
+    padding: 15px 25px;
+    background: #FFEBEE; /* Light red background */
+    border-radius: 12px;
     display: none;
     font-weight: bold;
-    /* Montserrat for error message */
     font-family: 'Montserrat', sans-serif;
+    border: 1px solid #EF9A9A;
 }
 
 .success {
-    color: #388e3c; /* Darker green */
-    margin-top: 20px;
-    padding: 12px 20px;
-    background: #e8f5e9; /* Light green background */
-    border-radius: 10px;
+    color: #4CAF50; /* Brighter green */
+    margin-top: 25px;
+    padding: 15px 25px;
+    background: #E8F5E9; /* Light green background */
+    border-radius: 12px;
     display: none;
     font-weight: bold;
-    /* Montserrat for success message */
     font-family: 'Montserrat', sans-serif;
+    border: 1px solid #A5D6A7;
 }
 
 /* Glitter effect on hover for upload area */
 .upload-area::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+    border-radius: 50%;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: all 0.5s ease-out; /* Slower, smoother transition */
     pointer-events: none;
-    transform: scale(0);
+    transform: translate(-50%, -50%) scale(0);
 }
 
 .upload-area:hover::before {
     opacity: 1;
-    transform: scale(1);
+    width: 200%; /* Cover a larger area */
+    height: 200%;
+    transform: translate(-50%, -50%) scale(1);
 }
 
-/* Confetti animation for success */
-.confetti {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 9999;
-    pointer-events: none;
+/* Confetti animation */
+.confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    opacity: 0;
+    animation: fall 3s forwards ease-out;
+    border-radius: 50%; /* Make them round like glitter */
 }
+
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh) translateX(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% { opacity: 1; }
+    100% {
+        transform: translateY(100vh) translateX(calc(var(--rand-x) * 100vw)) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* For varying confetti fall */
+.confetti-piece:nth-child(even) {
+    animation-duration: 3.5s;
+    animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.confetti-piece:nth-child(3n) {
+    animation-duration: 2.8s;
+    animation-timing-function: ease-in-out;
+}
+
+/* Random X offset is handled by JS now for better control */
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
     .container {
-        padding: 30px;
+        padding: 40px;
+        border-radius: 25px;
     }
     h1 {
-        font-size: 2.8em; /* Adjusted for smaller screens */
+        font-size: 3.2em;
+    }
+    .subtitle {
+        font-size: 1.1em;
+        margin-bottom: 30px;
     }
     .upload-area {
-        padding: 30px;
+        padding: 40px;
+        margin: 30px 0;
     }
     .upload-text {
-        font-size: 1.2em;
+        font-size: 1.4em;
     }
     .process-btn {
-        padding: 15px 25px;
-        font-size: 1em;
+        padding: 16px 30px;
+        font-size: 1.1em;
     }
     .radio-group, .select-group {
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
+        align-items: flex-start; /* Align radios to left */
+    }
+    .option-group label {
+        font-size: 1.1em;
+    }
+    .download-btn {
+        margin: 15px 8px;
+        padding: 15px 25px;
+        font-size: 1em;
     }
 }
 
 @media (max-width: 480px) {
     .container {
+        padding: 25px;
+        border-radius: 20px;
+    }
+    h1 {
+        font-size: 2.5em;
+        letter-spacing: 1px;
+    }
+    .subtitle {
+        font-size: 0.95em;
+        margin-bottom: 25px;
+    }
+    .upload-area {
+        padding: 30px;
+        border-radius: 20px;
+    }
+    .upload-icon {
+        font-size: 3em;
+        margin-bottom: 20px;
+    }
+    .upload-text {
+        font-size: 1.2em;
+    }
+    .upload-subtext {
+        font-size: 0.9em;
+    }
+    .file-item {
+        font-size: 0.95em;
+        padding: 12px 15px;
+        border-radius: 12px;
+    }
+    .file-item span:first-child {
+        font-size: 1.5em;
+    }
+    .file-item .remove-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 15px;
+    }
+    .options {
         padding: 20px;
         border-radius: 15px;
     }
-    h1 {
-        font-size: 2.2em; /* Adjusted for smallest screens */
-    }
-    .subtitle {
+    .process-btn {
+        width: 100%;
+        padding: 14px 20px;
         font-size: 1em;
+        margin-top: 20px;
     }
-    .upload-area {
-        padding: 20px;
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border-width: 4px;
     }
-    .upload-icon {
-        font-size: 2.5em;
+    .result h3 {
+        font-size: 1.6em;
+        margin-bottom: 20px;
+    }
+    .result-image {
+        border-width: 4px;
     }
     .download-btn {
         width: 100%;
         margin: 10px 0;
+        font-size: 0.95em;
     }
 }
