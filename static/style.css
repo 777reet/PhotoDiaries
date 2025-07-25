@@ -1,532 +1,473 @@
-/* Import fonts for Option 1: Grand Hotel for headings, Montserrat for body */
-@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Montserrat:wght@400;700&display=swap');
-
-:root {
-    --primary-color: #C78CC7; /* Dusty Rose */
-    --secondary-color: #FFB3D9; /* Blush Pink */
-    --accent-color: #FFE0F0; /* Pale Lavender-Pink */
-    --text-color: #6A3B6A; /* Deep Plum */
-    --bg-gradient-start: #FCEFF9; /* Very Light Pink */
-    --bg-gradient-end: #EAD7F1; /* Soft Lilac */
-    --container-bg: #FFFFFF; /* Crisp White */
-    --shadow-color: rgba(0, 0, 0, 0.1); /* Softer Shadow */
-    --border-color: #F0CCEE; /* Delicate Rose Border */
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* General Body and Container Styling */
 body {
-    font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f7e6f9, #e6f7fa); /* Soft gradient background */
     min-height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 20px;
-    color: var(--text-color);
-    line-height: 1.6;
-    overflow-x: hidden; /* Prevent horizontal scroll from confetti */
+    align-items: center;
+    color: #4A0E4F; /* Deep plum color */
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
-.container {
-    background: var(--container-bg);
-    border-radius: 30px; /* More rounded */
-    padding: 60px; /* More space */
-    box-shadow: 0 20px 40px var(--shadow-color); /* Softer, larger shadow */
-    max-width: 800px; /* Wider container */
-    width: 100%;
+.photobooth-container {
+    background-color: #ffffff; /* White background for the main card */
+    border-radius: 25px; /* Softer rounded corners */
+    padding: 40px 30px;
+    box-shadow: 
+        0 8px 30px rgba(0, 0, 0, 0.1), /* Main shadow */
+        0 0 0 10px rgba(255, 255, 255, 0.5), /* Faint white border/glow */
+        0 0 0 12px rgba(255, 192, 203, 0.2); /* Soft pink halo */
+    max-width: 700px; /* Slightly wider for a more elegant feel */
+    width: 90%; /* Responsive width */
     text-align: center;
-    border: 2px solid var(--border-color); /* Subtle border */
-    position: relative; /* For image overlays */
-    overflow: hidden; /* Ensure content stays within bounds */
-}
-
-h1 {
-    color: var(--primary-color);
-    margin-bottom: 20px; /* More space below title */
-    font-size: 4em; /* Even larger, more prominent */
-    font-weight: 400;
-    letter-spacing: 2px; /* More elegant spacing */
-    font-family: 'Grand Hotel', cursive;
-    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.08); /* More defined shadow */
-}
-
-.subtitle {
-    color: var(--text-color);
-    margin-bottom: 50px; /* More space before upload */
-    font-size: 1.3em;
-    font-style: italic;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.upload-area {
-    border: 3px dashed var(--border-color);
-    border-radius: 25px; /* Softer edges */
-    padding: 60px; /* More space inside */
-    margin: 40px 0; /* More vertical space */
-    background: var(--accent-color);
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
-    cursor: pointer;
     position: relative;
-    overflow: hidden;
+    z-index: 1;
+    overflow: hidden; /* Ensure content stays within rounded corners */
+}
+
+/* Header Section */
+.header-section {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.header-section h1 {
+    font-family: 'Grand Hotel', cursive; /* Elegant script font */
+    font-size: 3.5em; /* Larger, more impactful title */
+    color: #8A2BE2; /* A lovely purple */
+    margin: 0;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+.header-icon {
+    width: 60px; /* Adjust size as needed */
+    height: auto;
+    vertical-align: middle;
+    margin-right: 15px;
+    transform: rotate(-10deg); /* Slight rotation for whimsy */
+    filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.1));
+}
+
+.sparkling-heart {
+    font-size: 2.5em; /* Large, noticeable heart */
+    margin-top: 10px;
+    display: block;
+    animation: pulse 1.5s infinite alternate; /* Gentle pulsating animation */
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+.tagline {
+    font-family: 'Lora', serif; /* A more elegant serif for the tagline */
+    font-size: 1.2em;
+    color: #6a0dad; /* Darker purple for contrast */
+    margin-top: 10px;
+}
+
+/* Upload Area */
+.upload-area {
+    border: 3px dashed #FFD1DC; /* Soft pink dashed border */
+    border-radius: 20px;
+    padding: 40px 20px;
+    background-color: #fff0f5; /* Lighter pink background */
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-bottom: 30px;
+    position: relative;
 }
 
 .upload-area:hover {
-    border-color: var(--primary-color);
-    background: #FFF5FA; /* Lighter, more ethereal background on hover */
-    transform: translateY(-8px); /* Lift more dramatically */
-    box-shadow: 0 18px 30px rgba(0,0,0,0.15); /* More pronounced shadow */
+    background-color: #ffe4e9; /* Slightly darker on hover */
+    border-color: #ffb6c1; /* Brighter pink on hover */
 }
 
-.upload-area.dragover {
-    border-color: var(--primary-color);
-    background: #FFEDF7; /* Even lighter */
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+.magic-star {
+    font-size: 4em;
+    color: gold;
+    display: block;
+    margin-bottom: 15px;
+    animation: rotateAndSparkle 3s infinite linear; /* Continuous rotation and sparkle */
 }
 
-.upload-icon {
-    font-size: 4em; /* Larger, more inviting icon */
-    color: var(--primary-color);
-    margin-bottom: 30px;
-    animation: bounceIn 1s ease-out;
+@keyframes rotateAndSparkle {
+    0% { transform: rotate(0deg) scale(1); opacity: 1; }
+    50% { transform: rotate(180deg) scale(1.1); opacity: 0.8; }
+    100% { transform: rotate(360deg) scale(1); opacity: 1; }
 }
 
-.upload-text {
-    font-size: 1.6em; /* Larger, clearer text */
-    color: var(--text-color);
-    margin-bottom: 20px;
-    font-weight: 700;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.upload-subtext {
-    font-size: 1.1em; /* Slightly larger subtext */
-    color: var(--primary-color);
-    opacity: 0.9;
-    font-family: 'Montserrat', sans-serif;
-}
-
-#fileInput {
-    display: none;
-}
-
-.file-list {
-    margin: 30px 0; /* More space */
-    text-align: left;
-    max-height: 200px; /* Slightly more height */
-    overflow-y: auto;
-    padding-right: 10px; /* For scrollbar spacing */
-}
-
-.file-item {
-    display: flex;
-    align-items: center;
-    padding: 15px 20px; /* More padding */
-    margin: 10px 0; /* More spacing between items */
-    background: #fdfafd; /* Very light, almost white pink */
-    border-radius: 15px; /* More rounded */
+.upload-area p {
+    margin: 5px 0;
     font-size: 1.1em;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06); /* Softer shadow */
-    transition: transform 0.3s ease;
-    font-family: 'Montserrat', sans-serif;
+    color: #4A0E4F;
 }
 
-.file-item:hover {
-    transform: translateX(8px); /* More pronounced slide */
+.upload-area .or-click {
+    font-size: 0.9em;
+    color: #9370DB; /* Medium purple */
+    font-style: italic;
 }
 
-.file-item span:first-child {
-    font-size: 1.8em; /* Larger icon */
-    margin-right: 15px;
-    color: var(--primary-color);
+.file-info {
+    font-size: 0.8em;
+    color: #A9A9A9;
+    margin-top: 15px;
 }
 
-.file-item .filename {
-    flex: 1;
-    margin-right: 20px;
-    color: var(--text-color);
-    white-space: nowrap;
+.file-previews {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.file-preview-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border: 2px solid #FFC0CB;
+    border-radius: 10px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.file-item .remove-btn {
-    background: var(--secondary-color);
+.file-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.file-preview-item .remove-file {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #FF69B4;
     color: white;
-    border: none;
     border-radius: 50%;
-    width: 32px; /* Larger button */
-    height: 32px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8em;
     cursor: pointer;
-    font-size: 18px; /* Larger font */
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 10;
+    transition: background-color 0.2s ease;
 }
 
-.file-item .remove-btn:hover {
-    background: #FF85C1; /* Brighter pink */
-    transform: scale(1.2) rotate(15deg); /* More playful transform */
+.file-preview-item .remove-file:hover {
+    background-color: #CD5C5C;
 }
 
-.options {
-    margin: 40px 0;
-    text-align: left;
-    padding: 25px; /* More padding */
-    border: 1px solid var(--border-color);
-    border-radius: 20px; /* More rounded */
-    background: #fffafa; /* Off-white pink */
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.03); /* Subtle inner shadow */
+/* Options Section */
+.options-section {
+    margin-bottom: 30px;
 }
 
 .option-group {
-    margin-bottom: 25px; /* More space */
+    border: 2px solid #FFC0CB; /* Light pink border */
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    background-color: #fffaf0; /* Creamy background */
+    box-shadow: inset 0 0 10px rgba(255, 192, 203, 0.2); /* Inner glow */
 }
 
-.option-group:last-child {
-    margin-bottom: 0;
+.option-group legend {
+    font-family: 'Lora', serif; /* Elegant serif for legends */
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #8A2BE2; /* Purple heading */
+    padding: 0 10px;
+    text-align: left;
+    margin-left: 20px; /* Indent legend slightly */
 }
 
-.option-group label {
-    display: block;
-    margin-bottom: 12px;
-    font-weight: bold;
-    color: var(--primary-color);
-    font-size: 1.2em; /* Larger label */
-    font-family: 'Montserrat', sans-serif;
-}
-
-.radio-group, .select-group {
+.option-row {
     display: flex;
-    gap: 30px; /* More spacing */
     flex-wrap: wrap;
-    justify-content: center; /* Center options */
+    justify-content: center; /* Center cards within the group */
+    gap: 15px;
+    margin-top: 15px;
 }
 
-.radio-group input[type="radio"] {
-    margin-right: 10px;
-    accent-color: var(--primary-color);
-    transform: scale(1.2); /* Slightly larger radio buttons */
-}
-
-.radio-group label {
-    font-weight: normal;
-    color: var(--text-color);
+.option-card {
+    display: block; /* Make the label itself the clickable card */
+    background-color: #FFD1DC; /* Soft pink card background */
+    border-radius: 15px;
+    padding: 15px 20px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: calc(33% - 20px); /* For 3 items per row */
+    min-width: 160px; /* Minimum width to prevent squishing */
     display: flex;
     align-items: center;
-    font-family: 'Montserrat', sans-serif;
-    transition: color 0.2s ease;
+    justify-content: center;
+    text-align: center;
+    position: relative; /* For the radio button indicator */
 }
 
-.radio-group label:hover {
-    color: var(--secondary-color); /* Highlight text on hover */
+.option-card input[type="radio"] {
+    position: absolute;
+    opacity: 0; /* Hide default radio button */
+    pointer-events: none; /* Prevent clicks on hidden radio */
 }
 
-.process-btn {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+.option-card .card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: #4A0E4F; /* Dark plum text */
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.option-card .card-icon {
+    font-size: 1.8em; /* Larger icons */
+}
+
+.option-card:hover {
+    background-color: #FFB6C1; /* Darker pink on hover */
+    transform: translateY(-3px); /* Slight lift effect */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.option-card input[type="radio"]:checked + .card-content {
+    /* Style when selected */
+    color: #FFFFFF; /* White text when selected */
+    font-weight: 600;
+}
+
+.option-card input[type="radio"]:checked + .card-content::before {
+    content: '✓'; /* Checkmark icon */
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #8A2BE2; /* Purple checkmark background */
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.option-card input[type="radio"]:checked {
+    border-color: #8A2BE2; /* Highlight border on selection */
+    background: linear-gradient(45deg, #8A2BE2, #9370DB); /* Gradient background on selection */
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.5); /* Stronger glow on selection */
+}
+
+/* Submit Button */
+.submit-button {
+    background: linear-gradient(45deg, #FF69B4, #9370DB); /* Pink to purple gradient */
     color: white;
     border: none;
-    padding: 20px 40px; /* Larger padding */
-    font-size: 1.3em; /* Larger font */
-    border-radius: 35px; /* More rounded */
+    border-radius: 50px; /* Pill shape */
+    padding: 15px 30px;
+    font-size: 1.3em;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncier transition */
-    margin-top: 30px;
-    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-    font-family: 'Montserrat', sans-serif;
 }
 
-.process-btn:hover {
-    transform: translateY(-8px) scale(1.03); /* More pronounced lift */
-    box-shadow: 0 18px 30px var(--shadow-color);
+.submit-button:hover {
+    transform: translateY(-5px); /* Lift effect */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #FF1493, #6A0DAD); /* Stronger gradient on hover */
 }
 
-.process-btn:disabled {
-    background: #E0E0E0; /* Lighter disabled color */
-    color: #9E9E9E; /* Greyer text */
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-    opacity: 0.8;
-}
-
-.loading {
-    display: none;
-    margin-top: 40px;
-    color: var(--primary-color);
+.sparkle-icon {
     font-size: 1.2em;
-    font-family: 'Montserrat', sans-serif;
+    animation: sparkleEffect 1s infinite alternate;
 }
 
-.loading-spinner {
-    border: 6px solid #f3f3f3; /* Thicker spinner */
-    border-top: 6px solid var(--primary-color);
-    border-radius: 50%;
-    width: 60px; /* Larger spinner */
-    height: 60px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 25px;
+@keyframes sparkleEffect {
+    from { transform: scale(1) rotate(0deg); opacity: 1; }
+    to { transform: scale(1.2) rotate(15deg); opacity: 0.8; }
+}
+
+/* Result Section */
+.result-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed #FFD1DC; /* Separator line */
+}
+
+.result-message {
+    font-family: 'Lora', serif;
+    font-size: 1.4em;
+    color: #8A2BE2;
+    margin-bottom: 20px;
+}
+
+.processed-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 0 5px #FFD1DC; /* Pink border/glow */
+    margin-bottom: 25px;
+}
+
+.result-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.download-button,
+.create-another-button {
+    background: linear-gradient(45deg, #9370DB, #FF69B4); /* Purple to pink gradient */
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none; /* For download link */
+}
+
+.download-button:hover,
+.create-another-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(45deg, #6A0DAD, #FF1493); /* Stronger gradient on hover */
+}
+
+.download-icon, .reset-icon {
+    font-size: 1em;
+}
+
+/* Error Message */
+.error-message {
+    background-color: #ffcccc;
+    color: #d10000;
+    border: 1px solid #d10000;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+    font-weight: 500;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 240, 245, 0.8); /* Semi-transparent light pink */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px); /* Soft blur effect */
+}
+
+.spinner {
+    font-size: 4em;
+    animation: spin 1.5s infinite linear; /* Gentle spin animation */
+    margin-bottom: 20px;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-@keyframes bounceIn {
-    0% { transform: scale(0.1); opacity: 0; }
-    60% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); }
+.loading-overlay p {
+    font-size: 1.5em;
+    color: #8A2BE2;
+    font-weight: 600;
+    animation: fadeInOut 2s infinite alternate; /* Pulsating text effect */
 }
 
-.result {
-    display: none;
-    margin-top: 50px; /* More space */
-    padding: 30px; /* More padding */
-    background: #fdf8fb; /* Lighter pink */
-    border-radius: 25px; /* More rounded */
-    border: 2px dashed var(--secondary-color); /* Thicker dashed border */
-    box-shadow: inset 0 0 20px rgba(255, 105, 180, 0.15); /* More prominent inner glow */
+@keyframes fadeInOut {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
 }
 
-.result h3 {
-    color: var(--primary-color);
-    font-size: 2em; /* Larger heading */
-    margin-bottom: 30px;
-    font-family: 'Montserrat', sans-serif;
+/* Utility Classes */
+.hidden {
+    display: none !important;
 }
 
-.result-image {
-    max-width: 95%; /* Almost full width for the strip */
-    height: auto;
-    border-radius: 20px; /* Softer corners */
-    box-shadow: 0 15px 40px var(--shadow-color); /* More significant shadow */
-    margin: 30px auto;
-    border: 8px solid var(--accent-color); /* Thicker, more decorative frame */
-    display: block;
-}
-
-.download-btn {
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 18px 35px; /* Larger padding */
-    font-size: 1.2em; /* Larger font */
-    border-radius: 30px; /* More rounded */
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    margin: 20px 15px; /* More spacing between buttons */
-    transition: all 0.4s ease;
-    font-weight: bold;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    font-family: 'Montserrat', sans-serif;
-}
-
-.download-btn.download {
-    background: var(--secondary-color); /* Different color for download */
-}
-
-.download-btn:hover {
-    background: var(--text-color); /* Darker on hover */
-    transform: translateY(-5px) scale(1.02); /* More pronounced lift */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-.error {
-    color: #E53935; /* Brighter red */
-    margin-top: 25px;
-    padding: 15px 25px;
-    background: #FFEBEE; /* Light red background */
-    border-radius: 12px;
-    display: none;
-    font-weight: bold;
-    font-family: 'Montserrat', sans-serif;
-    border: 1px solid #EF9A9A;
-}
-
-.success {
-    color: #4CAF50; /* Brighter green */
-    margin-top: 25px;
-    padding: 15px 25px;
-    background: #E8F5E9; /* Light green background */
-    border-radius: 12px;
-    display: none;
-    font-weight: bold;
-    font-family: 'Montserrat', sans-serif;
-    border: 1px solid #A5D6A7;
-}
-
-/* Glitter effect on hover for upload area */
-.upload-area::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
-    border-radius: 50%;
-    opacity: 0;
-    transition: all 0.5s ease-out; /* Slower, smoother transition */
-    pointer-events: none;
-    transform: translate(-50%, -50%) scale(0);
-}
-
-.upload-area:hover::before {
-    opacity: 1;
-    width: 200%; /* Cover a larger area */
-    height: 200%;
-    transform: translate(-50%, -50%) scale(1);
-}
-
-/* Confetti animation */
-.confetti-piece {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    opacity: 0;
-    animation: fall 3s forwards ease-out;
-    border-radius: 50%; /* Make them round like glitter */
-}
-
-@keyframes fall {
-    0% {
-        transform: translateY(-10vh) translateX(0) rotate(0deg);
-        opacity: 0;
-    }
-    10% { opacity: 1; }
-    100% {
-        transform: translateY(100vh) translateX(calc(var(--rand-x) * 100vw)) rotate(720deg);
-        opacity: 0;
-    }
-}
-
-/* For varying confetti fall */
-.confetti-piece:nth-child(even) {
-    animation-duration: 3.5s;
-    animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-
-.confetti-piece:nth-child(3n) {
-    animation-duration: 2.8s;
-    animation-timing-function: ease-in-out;
-}
-
-/* Random X offset is handled by JS now for better control */
-
-/* Media Queries for Responsiveness */
+/* Responsive Adjustments */
 @media (max-width: 768px) {
-    .container {
-        padding: 40px;
-        border-radius: 25px;
+    .photobooth-container {
+        padding: 30px 20px;
+        box-shadow: 
+            0 5px 20px rgba(0, 0, 0, 0.1),
+            0 0 0 5px rgba(255, 255, 255, 0.5),
+            0 0 0 8px rgba(255, 192, 203, 0.2);
     }
-    h1 {
-        font-size: 3.2em;
-    }
-    .subtitle {
-        font-size: 1.1em;
-        margin-bottom: 30px;
-    }
-    .upload-area {
-        padding: 40px;
-        margin: 30px 0;
-    }
-    .upload-text {
-        font-size: 1.4em;
-    }
-    .process-btn {
-        padding: 16px 30px;
-        font-size: 1.1em;
-    }
-    .radio-group, .select-group {
-        flex-direction: column;
-        gap: 20px;
-        align-items: flex-start; /* Align radios to left */
-    }
-    .option-group label {
-        font-size: 1.1em;
-    }
-    .download-btn {
-        margin: 15px 8px;
-        padding: 15px 25px;
-        font-size: 1em;
-    }
-}
 
-@media (max-width: 480px) {
-    .container {
-        padding: 25px;
-        border-radius: 20px;
+    .header-section h1 {
+        font-size: 2.8em;
     }
-    h1 {
-        font-size: 2.5em;
-        letter-spacing: 1px;
+
+    .header-icon {
+        width: 45px;
     }
-    .subtitle {
-        font-size: 0.95em;
-        margin-bottom: 25px;
-    }
-    .upload-area {
-        padding: 30px;
-        border-radius: 20px;
-    }
-    .upload-icon {
-        font-size: 3em;
-        margin-bottom: 20px;
-    }
-    .upload-text {
-        font-size: 1.2em;
-    }
-    .upload-subtext {
-        font-size: 0.9em;
-    }
-    .file-item {
-        font-size: 0.95em;
-        padding: 12px 15px;
-        border-radius: 12px;
-    }
-    .file-item span:first-child {
-        font-size: 1.5em;
-    }
-    .file-item .remove-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 15px;
-    }
-    .options {
-        padding: 20px;
-        border-radius: 15px;
-    }
-    .process-btn {
-        width: 100%;
-        padding: 14px 20px;
+
+    .tagline {
         font-size: 1em;
-        margin-top: 20px;
     }
-    .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border-width: 4px;
+
+    .upload-area {
+        padding: 30px 15px;
     }
-    .result h3 {
-        font-size: 1.6em;
-        margin-bottom: 20px;
+
+    .magic-star {
+        font-size: 3em;
     }
-    .result-image {
-        border-width: 4px;
+
+    .option-row {
+        flex-direction: column; /* Stack options on smaller screens */
+        align-items: center;
     }
-    .download-btn {
-        width: 100%;
-        margin: 10px 0;
-        font-size: 0.95em;
+
+    .option-card {
+        width: 80%; /* Wider cards when stacked */
+        min-width: unset;
+        padding: 12px 15px;
+    }
+
+    .submit-button,
+    .download-button,
+    .create-another-button {
+        font-size: 1.1em;
+        padding: 12px 20px;
+    }
+
+    .result-actions {
+        flex-direction: column;
+        gap: 15px;
     }
 }

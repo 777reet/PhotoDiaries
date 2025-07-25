@@ -1,231 +1,169 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let selectedFiles = [];
-    const minFiles = 1;
-    const maxFiles = 4;
+    const uploadForm = document.getElementById('uploadForm');
+    const dropArea = document.getElementById('dropArea');
+    const photoUploadInput = document.getElementById('photoUpload');
+    const filePreviews = document.getElementById('filePreviews');
+    const resultSection = document.getElementById('resultSection');
+    const processedImage = document.getElementById('processedImage');
+    const downloadLink = document.getElementById('downloadLink');
+    const createAnotherButton = document.getElementById('createAnother');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const errorMessage = document.getElementById('errorMessage');
 
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('fileInput');
-    const fileList = document.getElementById('fileList');
-    const processBtn = document.getElementById('processBtn');
-    const loading = document.getElementById('loading');
-    const errorDiv = document.getElementById('error');
-    const successDiv = document.getElementById('success');
-    const resultDiv = document.getElementById('result');
-    const resultImage = document.getElementById('resultImage');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const createAnotherBtn = document.getElementById('createAnotherBtn');
+    let uploadedFiles = []; // Array to store files selected by user
 
-    // Upload area click handler
-    uploadArea.addEventListener('click', () => {
-        fileInput.click();
-    });
+    // --- Drag & Drop Functionality ---
+    dropArea.addEventListener('click', () => photoUploadInput.click());
 
-    // File input change handler
-    fileInput.addEventListener('change', (e) => {
-        handleFiles(e.target.files);
-    });
-
-    // Drag and drop handlers
-    uploadArea.addEventListener('dragover', (e) => {
+    dropArea.addEventListener('dragover', (e) => {
         e.preventDefault();
-        uploadArea.classList.add('dragover');
+        dropArea.classList.add('hover');
     });
 
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.classList.remove('hover');
     });
 
-    uploadArea.addEventListener('drop', (e) => {
+    dropArea.addEventListener('drop', (e) => {
         e.preventDefault();
-        uploadArea.classList.remove('dragover');
+        dropArea.classList.remove('hover');
         handleFiles(e.dataTransfer.files);
     });
 
+    photoUploadInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
     function handleFiles(files) {
-        hideMessages();
-        // Clear selected files if new files are being added (simulating fresh selection)
-        selectedFiles = []; 
-        fileList.innerHTML = ''; // Clear display list immediately
+        errorMessage.classList.add('hidden'); // Hide any previous error
+        const maxFiles = 4;
+        const currentFileCount = uploadedFiles.length;
+        const newFileCount = files.length;
 
-        if (files.length === 0) {
-            showError('Please select at least one lovely photo. ✨');
-            updateProcessButtonState();
+        if (currentFileCount + newFileCount > maxFiles) {
+            displayError(`You can upload a maximum of ${maxFiles} photos. Please remove some or upload fewer.`);
             return;
         }
 
-        // Validate number of files first
-        if (files.length > maxFiles) {
-            showError(`Oh dear! Please select a maximum of ${maxFiles} photos. You picked ${files.length}.`);
-            updateProcessButtonState();
-            return;
-        }
-
-        let allFilesValid = true;
-        for (let file of files) {
-            if (!file.type.startsWith('image/')) {
-                showError('Oops! Only image files (like JPG, PNG, GIF) are allowed for this magic. 📸');
-                allFilesValid = false;
-                break;
+        for (const file of files) {
+            if (file.type.startsWith('image/') && uploadedFiles.length < maxFiles) {
+                uploadedFiles.push(file);
+                renderFilePreview(file);
+            } else if (!file.type.startsWith('image/')) {
+                displayError(`"${file.name}" is not a valid image file. Only JPG, PNG, GIF are allowed.`);
+            } else if (uploadedFiles.length >= maxFiles) {
+                 displayError(`Maximum of ${maxFiles} photos reached. "${file.name}" was not added.`);
             }
-            if (file.size > 16 * 1024 * 1024) { // 16MB
-                showError(`This photo is a bit too grand! Max size is 16MB. 🎈`);
-                allFilesValid = false;
-                break;
-            }
-            selectedFiles.push(file);
         }
-
-        if (!allFilesValid) {
-            selectedFiles = []; // Clear files if any invalid
-        }
-        updateFileList();
-        updateProcessButtonState();
+        // Clear the input so selecting same files again triggers change event
+        photoUploadInput.value = ''; 
     }
 
-    function updateFileList() {
-        fileList.innerHTML = ''; // Clear current list
+    function renderFilePreview(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const previewItem = document.createElement('div');
+            previewItem.classList.add('file-preview-item');
+            
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = file.name;
+            previewItem.appendChild(img);
 
-        if (selectedFiles.length > 0) {
-            selectedFiles.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <span>💖</span> <span class="filename">${file.name}</span>
-                    <button class="remove-btn" data-index="${index}">×</button>
-                `;
-                fileList.appendChild(fileItem);
+            const removeButton = document.createElement('span');
+            removeButton.classList.add('remove-file');
+            removeButton.textContent = 'X';
+            removeButton.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent triggering dropArea click
+                removeFile(file, previewItem);
             });
-            document.querySelectorAll('.remove-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const indexToRemove = parseInt(e.target.dataset.index);
-                    removeFile(indexToRemove);
-                });
-            });
-        }
+            previewItem.appendChild(removeButton);
+
+            filePreviews.appendChild(previewItem);
+        };
+        reader.readAsDataURL(file);
     }
 
-    function removeFile(index) {
-        selectedFiles.splice(index, 1);
-        updateFileList();
-        updateProcessButtonState();
-        hideMessages();
+    function removeFile(fileToRemove, previewItem) {
+        uploadedFiles = uploadedFiles.filter(file => file !== fileToRemove);
+        filePreviews.removeChild(previewItem);
+        errorMessage.classList.add('hidden'); // Clear error if files are removed
     }
 
-    function updateProcessButtonState() {
-        if (selectedFiles.length >= minFiles && selectedFiles.length <= maxFiles) {
-            processBtn.disabled = false;
-        } else {
-            processBtn.disabled = true;
-        }
-    }
+    // --- Form Submission ---
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    // Process button handler
-    processBtn.addEventListener('click', async () => {
-        if (selectedFiles.length < minFiles || selectedFiles.length > maxFiles) {
-            showError(`Psst! You need between ${minFiles} and ${maxFiles} photos to create magic. ✨`);
+        if (uploadedFiles.length === 0) {
+            displayError('Please upload at least one photo to conjure your strip!');
             return;
         }
+
+        if (uploadedFiles.length > 4) {
+             displayError('You can upload a maximum of 4 photos.');
+             return;
+        }
+
+        showLoading();
+        errorMessage.classList.add('hidden');
+        resultSection.classList.add('hidden'); // Hide previous result
 
         const formData = new FormData();
-        selectedFiles.forEach(file => {
+        uploadedFiles.forEach(file => {
             formData.append('photos', file);
         });
 
-        const colorMode = document.querySelector('input[name="color_mode"]:checked').value;
-        formData.append('color_mode', colorMode);
+        // Append selected options
+        formData.append('color_mode', document.querySelector('input[name="color_mode"]:checked').value);
+        formData.append('frame_style', document.querySelector('input[name="frame_style"]:checked').value);
+        formData.append('effect_filter', document.querySelector('input[name="effect_filter"]:checked').value);
 
-        const frameStyle = document.querySelector('input[name="frame_style"]:checked').value;
-        formData.append('frame_style', frameStyle);
-        
         try {
-            processBtn.disabled = true;
-            loading.style.display = 'block';
-            hideMessages();
-            resultDiv.style.display = 'none';
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            });
 
-            // Simulate API call for demonstration (replace with actual fetch to your backend)
-            // In a real scenario, this would be:
-            // const response = await fetch('/upload', {
-            //     method: 'POST',
-            //     body: formData
-            // });
-            // const data = await response.json();
-
-            // --- SIMULATION START ---
-            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
-            const simulatedData = {
-                success: true,
-                image_url: 'https://via.placeholder.com/400x1200/FFB3D9/FFFFFF?text=Your+Beautiful+Photobooth+Strip', // Placeholder image
-                download_url: 'https://via.placeholder.com/400x1200/FFB3D9/FFFFFF?text=Downloadable+Strip'
-            };
-            const data = simulatedData;
-            // --- SIMULATION END ---
+            const data = await response.json();
 
             if (data.success) {
-                resultImage.src = data.image_url;
-                downloadBtn.href = data.download_url;
-                resultDiv.style.display = 'block';
-                showSuccess('Voila! Your vintage photobooth strip is ready to shine! 💖');
-                triggerConfetti();
+                processedImage.src = data.image_url;
+                downloadLink.href = data.download_url;
+                resultSection.classList.remove('hidden');
+                uploadForm.classList.add('hidden'); // Hide form
             } else {
-                showError(data.error || 'Oops! An unexpected enchantment failed. Let\'s try again?');
+                displayError(data.error || 'An unknown error occurred.');
             }
-        } catch (err) {
-            console.error('Fetch error:', err);
-            showError('Network spell failed. Are you connected to the internet, sweetie? Try again!');
+        } catch (error) {
+            console.error('Error:', error);
+            displayError('Network error or server unavailable. Please try again later.');
         } finally {
-            loading.style.display = 'none';
-            updateProcessButtonState();
+            hideLoading();
         }
     });
 
-    // Create another button
-    createAnotherBtn.addEventListener('click', () => {
-        location.reload(); // Simple reload to restart the process
+    // --- UI State Management ---
+    function showLoading() {
+        loadingOverlay.classList.remove('hidden');
+    }
+
+    function hideLoading() {
+        loadingOverlay.classList.add('hidden');
+    }
+
+    function displayError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+    }
+
+    // --- Reset Functionality ---
+    createAnotherButton.addEventListener('click', () => {
+        uploadedFiles = [];
+        filePreviews.innerHTML = ''; // Clear previews
+        uploadForm.reset(); // Reset form radio buttons etc.
+        resultSection.classList.add('hidden');
+        uploadForm.classList.remove('hidden'); // Show form again
+        errorMessage.classList.add('hidden'); // Hide any errors
+        photoUploadInput.value = ''; // Clear file input value
     });
-
-    function showError(message) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        successDiv.style.display = 'none';
-    }
-
-    function showSuccess(message) {
-        successDiv.textContent = message;
-        successDiv.style.display = 'block';
-        errorDiv.style.display = 'none';
-    }
-
-    function hideMessages() {
-        errorDiv.style.display = 'none';
-        successDiv.style.display = 'none';
-    }
-
-    function triggerConfetti() {
-        const colors = ['#C78CC7', '#FFB3D9', '#FFE0F0', '#6A3B6A', '#ffffff'];
-        const confettiCount = 100; // More confetti!
-
-        for (let i = 0; i < confettiCount; i++) {
-            const confetti = document.createElement('div');
-            confetti.classList.add('confetti-piece');
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.animationDelay = (Math.random() * 2) + 's';
-            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-            confetti.style.opacity = Math.random() * 0.5 + 0.5; // More subtle opacity
-            confetti.style.width = confetti.style.height = (Math.random() * 8 + 6) + 'px'; // Varying sizes for charm
-
-            // Random X offset for a wider spread
-            confetti.style.setProperty('--rand-x', (Math.random() * 2 - 1).toFixed(2));
-
-            document.body.appendChild(confetti);
-
-            confetti.addEventListener('animationend', () => {
-                confetti.remove();
-            });
-        }
-    }
-    
-    // Initial state setup when the page loads
-    updateProcessButtonState();
 });

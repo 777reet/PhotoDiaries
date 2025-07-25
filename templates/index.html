@@ -3,109 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabrina's Dream Photobooth ✨</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    
+    <title>Sabrina's Dream Booth ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        /* This style block for confetti-piece can remain here or be moved to style.css */
-        .confetti-piece {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            opacity: 0;
-            animation: fall 3s forwards ease-out;
-            border-radius: 50%; /* Make them round like glitter */
-        }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-10vh) translateX(0) rotate(0deg);
-                opacity: 0;
-            }
-            10% { opacity: 1; }
-            100% {
-                transform: translateY(100vh) translateX(calc(var(--rand-x) * 100vw)) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        .confetti-piece:nth-child(even) {
-            animation-duration: 3.5s;
-            animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-
-        .confetti-piece:nth-child(3n) {
-            animation-duration: 2.8s;
-            animation-timing-function: ease-in-out;
-        }
-
-        /* The --rand-x variable is set dynamically by JavaScript for wider confetti spread */
-    </style>
-</head>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit-id.js" crossorigin="anonymous"></script> 
+    </head>
 <body>
-    <div class="container">
-        <h1>📸 Sabrina's Dream Booth 💖</h1>
-        <p class="subtitle">Upload 1 to 4 photos and let's create your perfect vintage strip! </p>
+    <div class="photobooth-container">
+        <header class="header-section">
+            <img src="{{ url_for('static', filename='camera_icon.png') }}" alt="Camera" class="header-icon">
+            <h1>Sabrina's Dream Booth</h1>
+            <div class="sparkling-heart">❤️✨</div>
+            <p class="tagline">Upload your magical moments and let's create a vintage strip!</p>
+        </header>
 
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">✨</div>
-            <div class="upload-text">Drag & drop your magical moments here</div>
-            <div class="upload-subtext">Or click to select. (JPG, PNG, GIF | Max 16MB each)</div>
-        </div>
-
-        <input type="file" id="fileInput" multiple accept="image/*">
-
-        <div class="file-list" id="fileList"></div>
-
-        <div class="options">
-            <div class="option-group">
-                <label>Choose Your Vibe:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="color_mode" value="bw" checked> Classic B&W</label>
-                    <label><input type="radio" name="color_mode" value="sepia"> Warm Sepia</label>
-                    <label><input type="radio" name="color_mode" value="color"> Dreamy Color</label>
-                </div>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="upload-area" id="dropArea">
+                <span class="magic-star">✨</span>
+                <p>Drag & drop your magical moments here</p>
+                <p class="or-click">Or click to select.</p>
+                <input type="file" id="photoUpload" name="photos" accept="image/png, image/jpeg, image/gif" multiple style="display: none;">
+                <p class="file-info">JPG, PNG, GIF | Max 16MB each</p>
+                <div id="filePreviews" class="file-previews"></div>
             </div>
 
-            <div class="option-group">
-                <label>Frame It Up:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="frame_style" value="classic" checked> Subtle Edge</label>
-                    <label><input type="radio" name="frame_style" value="polaroid"> Polaroid Perfect</label>
-                    <label><input type="radio" name="frame_style" value="distressed"> Vintage Distressed</label> </div>
+            <div class="options-section">
+                <fieldset class="option-group">
+                    <legend>Vintage Vibes</legend>
+                    <div class="option-row">
+                        <label class="option-card">
+                            <input type="radio" name="color_mode" value="bw" checked>
+                            <span class="card-content">
+                                <span class="card-icon">🎞️</span>
+                                Black & White Classic
+                            </span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="color_mode" value="sepia">
+                            <span class="card-content">
+                                <span class="card-icon">🍂</span>
+                                Warm Vintage Sepia
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="option-group">
+                    <legend>Frame It Up</legend>
+                    <div class="option-row">
+                        <label class="option-card">
+                            <input type="radio" name="frame_style" value="classic" checked>
+                            <span class="card-content">
+                                <span class="card-icon">🖼️</span>
+                                Elegant Border
+                            </span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="frame_style" value="polaroid">
+                            <span class="card-content">
+                                <span class="card-icon">📸</span>
+                                Dreamy Polaroid
+                            </span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="frame_style" value="distressed">
+                            <span class="card-content">
+                                <span class="card-icon">🕰️</span>
+                                Rustic Distressed
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="option-group">
+                    <legend>Add a Sprinkle of Magic</legend>
+                    <div class="option-row">
+                        <label class="option-card">
+                            <input type="radio" name="effect_filter" value="none" checked>
+                            <span class="card-content">
+                                <span class="card-icon">✨</span>
+                                No Extra Magic
+                            </span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="effect_filter" value="glitter">
+                            <span class="card-content">
+                                <span class="card-icon">💖</span>
+                                Glitter & Sparkle
+                            </span>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="effect_filter" value="bokeh">
+                            <span class="card-content">
+                                <span class="card-icon">💫</span>
+                                Soft Bokeh Dream
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
             </div>
 
-            <div class="option-group">
-                <label>Add a Sprinkle of Magic:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="effect_filter" value="none" checked> None (Just Pretty!)</label>
-                    <label><input type="radio" name="effect_filter" value="glitter"> Glitter Overlay ✨</label>
-                    <label><input type="radio" name="effect_filter" value="bokeh"> Soft Bokeh Dream 🌸</label>
-                </div>
-            </div>
+            <button type="submit" class="submit-button">
+                Conjure My Strip! <span class="sparkle-icon">✨</span>
+            </button>
+        </form>
 
-        </div>
-
-        <button class="process-btn" id="processBtn" disabled>Conjure My Strip! 🪄</button>
-
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <p>Sprinkling some magic on your photos... Almost there! ✨</p>
-        </div>
-
-        <div class="error" id="error"></div>
-        <div class="success" id="success"></div>
-
-        <div class="result" id="result">
-            <h3>Your Enchanting Photobooth Strip is Ready! 🎉</h3>
-            <img class="result-image" id="resultImage" alt="Vintage Photobooth Strip">
-            <div>
-                <a class="download-btn download" id="downloadBtn" href="#" download="sabrina_photobooth_strip.jpg">Download Your Memory 🎀</a>
-                <button class="download-btn" id="createAnotherBtn">Create Another Masterpiece 💫</button>
+        <div id="resultSection" class="result-section hidden">
+            <p class="result-message">Your vintage strip is ready, darling!</p>
+            <img id="processedImage" src="" alt="Processed Photobooth Strip" class="processed-image">
+            <div class="result-actions">
+                <a id="downloadLink" href="#" download class="download-button">Download My Magic! <span class="download-icon">⬇️</span></a>
+                <button id="createAnother" class="create-another-button">Create Another! <span class="reset-icon">🔄</span></button>
             </div>
         </div>
+
+        <div id="errorMessage" class="error-message hidden"></div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner">🌸</div>
+        <p>Conjuring your vintage memories...</p>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
