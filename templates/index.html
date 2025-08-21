@@ -3,151 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sabrina's Dream Booth ✨</title>
-    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:wght@300;400;600&family=Parisienne&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>✨ Whimsical Photobooth ✨</title>
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <div class="horizontal-scroll-container">
+    <!-- Floating bubbles background -->
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
 
-        <section id="welcomeUploadPanel" class="panel welcome-upload-panel">
-            <header class="header-section">
-                <h1>
-                    Sabrina's Dream Booth <span class="sparkling-icon">✨</span>
-                </h1>
-                <p class="tagline">Conjure your vintage photo strips in a magical way!</p>
-            </header>
+    <!-- Header -->
+    <header class="app-header">
+        <h1 class="logo">
+            <span class="camera-icon">📸</span>
+            <span class="logo-text">Whimsical Booth</span>
+            <span class="sparkle">✨</span>
+        </h1>
+        <div class="session-info">
+            <span id="sessionId">Session: New</span>
+            <button id="newSession" class="btn btn-ghost">🔄 New Session</button>
+        </div>
+    </header>
 
-            <form id="uploadForm" enctype="multipart/form-data" class="panel-content">
-                <div class="upload-area" id="dropArea">
-                    <div class="portal-glow"></div> <span class="upload-icon">⬆️</span> <p class="drag-text">Drag & drop your magical moments here</p>
-                    <button type="button" class="click-to-select-btn bloom-button">Or Click to Select</button>
-                    <input type="file" id="photoUpload" name="photos" accept="image/png, image/jpeg, image/gif" multiple style="display: none;">
-                    <p class="file-info">JPG, PNG, GIF | Max 16MB each</p>
-                    <div id="filePreviews" class="file-previews"></div>
-                </div>
-
-                <button type="button" id="goToOptions" class="nav-button bloom-button">
-                    Next: Choose Magic! <span class="nav-arrow">→</span>
-                </button>
-            </form>
-        </section>
-
-        <section id="optionsPanel" class="panel options-panel">
-            <h2 class="panel-title">Choose Your Magic Spells</h2>
-
-            <div class="panel-content">
-                <fieldset class="option-group">
-                    <legend>Vintage Vibes</legend>
-                    <div class="option-row">
-                        <label class="option-charm">
-                            <input type="radio" name="color_mode" value="bw" checked>
-                            <span class="charm-content">
-                                <span class="charm-icon">🎞️</span>
-                                <span class="charm-text">Black & White</span>
-                            </span>
-                        </label>
-                        <label class="option-charm">
-                            <input type="radio" name="color_mode" value="sepia">
-                            <span class="charm-content">
-                                <span class="charm-icon">🍂</span>
-                                <span class="charm-text">Warm Sepia</span>
-                            </span>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <fieldset class="option-group">
-                    <legend>Frame It Up</legend>
-                    <div class="option-row">
-                        <label class="option-charm">
-                            <input type="radio" name="frame_style" value="classic" checked>
-                            <span class="charm-content">
-                                <span class="charm-icon">🖼️</span>
-                                <span class="charm-text">Elegant Frame</span>
-                            </span>
-                        </label>
-                        <label class="option-charm">
-                            <input type="radio" name="frame_style" value="polaroid">
-                            <span class="charm-content">
-                                <span class="charm-icon">📸</span>
-                                <span class="charm-text">Dreamy Polaroid</span>
-                            </span>
-                        </label>
-                        <label class="option-charm">
-                            <input type="radio" name="frame_style" value="distressed">
-                            <span class="charm-content">
-                                <span class="charm-icon">🕰️</span>
-                                <span class="charm-text">Rustic Distressed</span>
-                            </span>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <fieldset class="option-group">
-                    <legend>Add a Sprinkle of Magic</legend>
-                    <div class="option-row">
-                        <label class="option-charm">
-                            <input type="radio" name="effect_filter" value="none" checked>
-                            <span class="charm-content">
-                                <span class="charm-icon">✨</span>
-                                <span class="charm-text">No Extra Magic</span>
-                            </span>
-                        </label>
-                        <label class="option-charm">
-                            <input type="radio" name="effect_filter" value="glitter">
-                            <span class="charm-content">
-                                <span class="charm-icon">💖</span>
-                                <span class="charm-text">Glitter & Sparkle</span>
-                            </span>
-                        </label>
-                        <label class="option-charm">
-                            <input type="radio" name="effect_filter" value="bokeh">
-                            <span class="charm-content">
-                                <span class="charm-icon">💫</span>
-                                <span class="charm-text">Soft Bokeh Dream</span>
-                            </span>
-                        </label>
-                    </div>
-                </fieldset>
+    <!-- Main container -->
+    <div class="container">
+        <!-- Left Panel - Camera & Upload -->
+        <div class="panel camera-panel">
+            <div class="panel-header">
+                <h2>📷 Capture Magic</h2>
             </div>
-
-            <button type="submit" form="uploadForm" class="submit-button bloom-button">
-                Conjure My Strip! <span class="sparkle-icon">✨</span>
-            </button>
-
-            <button type="button" id="goToWelcome" class="nav-button nav-button-prev bloom-button">
-                <span class="nav-arrow">←</span> Back
-            </button>
-        </section>
-
-        <section id="resultPanel" class="panel result-panel">
-            <h2 class="panel-title">Your Vintage Strip is Ready!</h2>
-            <div class="panel-content">
-                <img id="processedImage" src="" alt="Processed Photobooth Strip" class="processed-image">
-                <div class="result-actions">
-                    <a id="downloadLink" href="#" download class="download-button bloom-button">Download My Magic! ⬇️</a>
-                    <button id="createAnother" class="create-another-button bloom-button">Create Another! 🔄</button>
+            
+            <!-- Camera/Upload Section -->
+            <div class="capture-section">
+                <div class="camera-preview" id="cameraPreview">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <div class="camera-overlay">
+                        <div class="viewfinder"></div>
+                    </div>
+                </div>
+                
+                <div class="capture-controls">
+                    <button id="startCamera" class="btn btn-primary">📹 Start Camera</button>
+                    <button id="capturePhoto" class="btn btn-accent" style="display: none;">📸 Snap!</button>
+                    <button id="stopCamera" class="btn btn-secondary" style="display: none;">⏹️ Stop</button>
+                </div>
+                
+                <div class="upload-section">
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="fileInput" accept="image/*" multiple>
+                        <div class="upload-content">
+                            <span class="upload-icon">🖼️</span>
+                            <p>Drop images here or click to browse</p>
+                            <small>Support multiple files</small>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button type="button" id="goToOptionsFromResult" class="nav-button nav-button-prev bloom-button">
-                <span class="nav-arrow">←</span> Back to Options
-            </button>
-        </section>
 
-        <div id="errorMessage" class="error-message hidden"></div>
-
-        <div id="loadingOverlay" class="loading-overlay hidden">
-            <div class="loading-spinner-container">
-                <span class="loading-spinner-petal petal-1">🌸</span>
-                <span class="loading-spinner-petal petal-2">💖</span>
-                <span class="loading-spinner-petal petal-3">✨</span>
-                <span class="loading-spinner-petal petal-4">💫</span>
+            <!-- Fun Stats -->
+            <div class="stats-mini">
+                <div class="stat-item">
+                    <span class="stat-emoji">📊</span>
+                    <span>Photos: <span id="photoCount">0</span></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-emoji">🎨</span>
+                    <span>Filters: <span id="filtersUsed">0</span></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-emoji">⚡</span>
+                    <span>Strips: <span id="stripsCreated">0</span></span>
+                </div>
             </div>
-            <p>Conjuring your vintage memories...</p>
         </div>
 
-    </div> <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <!-- Center Panel - Preview & Filters -->
+        <div class="panel preview-panel">
+            <div class="panel-header">
+                <h2>🎨 Style Studio</h2>
+            </div>
+            
+            <!-- Image Preview -->
+            <div class="image-preview" id="imagePreview">
+                <div class="preview-placeholder">
+                    <span class="placeholder-icon">🖼️</span>
+                    <p>Your masterpiece appears here</p>
+                </div>
+            </div>
+            
+            <!-- Filter Controls -->
+            <div class="filter-section">
+                <h3>✨ Magic Filters</h3>
+                <div class="filter-grid">
+                    <button class="filter-btn" data-filter="none">
+                        <span class="filter-emoji">🌈</span>
+                        <span>Original</span>
+                    </button>
+                    <button class="filter-btn" data-filter="vintage">
+                        <span class="filter-emoji">📜</span>
+                        <span>Vintage</span>
+                    </button>
+                    <button class="filter-btn" data-filter="bw">
+                        <span class="filter-emoji">⚫</span>
+                        <span>B&W</span>
+                    </button>
+                    <button class="filter-btn" data-filter="blur">
+                        <span class="filter-emoji">💫</span>
+                        <span>Dreamy</span>
+                    </button>
+                    <button class="filter-btn" data-filter="enhance">
+                        <span class="filter-emoji">✨</span>
+                        <span>Vibrant</span>
+                    </button>
+                    <button class="filter-btn" data-filter="retro">
+                        <span class="filter-emoji">🕺</span>
+                        <span>Retro</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="processImage" class="btn btn-primary">🎭 Apply Magic</button>
+                <button id="saveImage" class="btn btn-accent">💾 Save Image</button>
+                <button id="createStrip" class="btn btn-gradient">🎞️ Make Strip</button>
+            </div>
+        </div>
+
+        <!-- Right Panel - Gallery & Features -->
+        <div class="panel gallery-panel">
+            <div class="panel-header">
+                <h2>🖼️ Gallery</h2>
+                <div class="panel-controls">
+                    <button id="refreshGallery" class="btn btn-ghost btn-sm">🔄</button>
+                    <button id="clearGallery" class="btn btn-ghost btn-sm">🗑️</button>
+                </div>
+            </div>
+            
+            <!-- Image Gallery -->
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Images will be populated here -->
+            </div>
+            
+            <!-- Fun Features -->
+            <div class="fun-features">
+                <div class="feature-tabs">
+                    <button class="tab-btn active" data-tab="templates">🎨 Templates</button>
+                    <button class="tab-btn" data-tab="frames">🖼️ Frames</button>
+                    <button class="tab-btn" data-tab="stickers">🎭 Stickers</button>
+                </div>
+                
+                <!-- Templates Tab -->
+                <div class="tab-content active" id="templates">
+                    <div class="template-grid">
+                        <div class="template-item" data-template="collage">
+                            <span class="template-emoji">🎨</span>
+                            <span>Collage</span>
+                        </div>
+                        <div class="template-item" data-template="mirror">
+                            <span class="template-emoji">🪞</span>
+                            <span>Mirror</span>
+                        </div>
+                        <div class="template-item" data-template="split">
+                            <span class="template-emoji">✂️</span>
+                            <span>Split</span>
+                        </div>
+                        <div class="template-item" data-template="grid">
+                            <span class="template-emoji">⚏</span>
+                            <span>Grid</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Frames Tab -->
+                <div class="tab-content" id="frames">
+                    <div class="frame-grid">
+                        <div class="frame-item" data-frame="polaroid">📷 Polaroid</div>
+                        <div class="frame-item" data-frame="vintage">🖼️ Vintage</div>
+                        <div class="frame-item" data-frame="modern">✨ Modern</div>
+                        <div class="frame-item" data-frame="film">🎞️ Film Strip</div>
+                    </div>
+                </div>
+                
+                <!-- Stickers Tab -->
+                <div class="tab-content" id="stickers">
+                    <div class="sticker-grid">
+                        <span class="sticker-item" data-sticker="heart">💖</span>
+                        <span class="sticker-item" data-sticker="star">⭐</span>
+                        <span class="sticker-item" data-sticker="rainbow">🌈</span>
+                        <span class="sticker-item" data-sticker="party">🎉</span>
+                        <span class="sticker-item" data-sticker="fire">🔥</span>
+                        <span class="sticker-item" data-sticker="cool">😎</span>
+                        <span class="sticker-item" data-sticker="cute">🥰</span>
+                        <span class="sticker-item" data-sticker="sparkle">✨</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Panel - Photo Strip Preview -->
+    <div class="strip-preview" id="stripPreview">
+        <div class="strip-header">
+            <h3>🎞️ Photo Strip Preview</h3>
+            <div class="strip-controls">
+                <button id="downloadStrip" class="btn btn-accent btn-sm">📥 Download</button>
+                <button id="shareStrip" class="btn btn-primary btn-sm">🔗 Share</button>
+                <button id="printStrip" class="btn btn-secondary btn-sm">🖨️ Print</button>
+            </div>
+        </div>
+        <div class="strip-container" id="stripContainer">
+            <div class="strip-placeholder">
+                <span class="strip-emoji">🎞️</span>
+                <p>Create your first photo strip!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab-container">
+        <button class="fab" id="magicFab">
+            <span class="fab-icon">✨</span>
+        </button>
+        <div class="fab-menu">
+            <button class="fab-option" data-action="random-filter">🎲 Random Filter</button>
+            <button class="fab-option" data-action="auto-enhance">🔮 Auto Enhance</button>
+            <button class="fab-option" data-action="surprise-me">🎉 Surprise Me!</button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Creating magic... ✨</p>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti"></canvas>
+
+    <script src="static/script.js"></script>
 </body>
 </html>
