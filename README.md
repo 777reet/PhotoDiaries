@@ -1,6 +1,6 @@
 # Photobooth Studio
 
-A modern web-based photobooth application built with vanilla Python JavaScript and CSS. Capture photos through your webcam or upload images, apply real-time filters, create photo strips, and manage your photo gallery.
+A modern web-based photobooth application with AI-powered image similarity search. Features a FastAPI backend with ChromaDB vector database for intelligent photo management and discovery.
 
 ## Features
 
@@ -8,17 +8,35 @@ A modern web-based photobooth application built with vanilla Python JavaScript a
 - **File Upload**: Drag-and-drop or browse to upload multiple images
 - **Real-time Filters**: Apply vintage, black & white, blur, enhance, and retro effects
 - **Photo Strips**: Combine multiple photos into classic photobooth strips
-- **Gallery Management**: View, organize, and reload captured images
+- **Vector Search**: Find similar images using AI-powered similarity matching
+- **Session Management**: Persistent sessions with unique IDs and cross-session search
 - **Interactive Effects**: Confetti, sparkles, and dynamic color schemes
-- **Keyboard Shortcuts**: Space to capture, Enter to process, Ctrl+S to save
-- **Session Persistence**: Auto-save gallery data with unique session IDs
+- **API Integration**: Full backend processing with metadata storage
 
 ## Tech Stack
 
-- Pure JavaScript (ES6+)
-- HTML5 Canvas for image processing
-- CSS3 animations and effects
-- MediaDevices API for camera access
-- Local storage for data persistence
+**Frontend:**
+- Pure JavaScript (ES6+) with Canvas API for image processing
+- HTML5 MediaDevices API for camera access
+- CSS3 animations and modern UI components
+
+**Backend:**
+- FastAPI with automatic API documentation
+- ChromaDB vector database for image embeddings
+- PIL/Pillow for server-side image processing
+- NumPy for advanced filter algorithms
+
+**Features:**
+- Vector similarity search for finding related photos
+- Persistent storage across sessions
+- RESTful API with JSON responses
+- Automatic image feature extraction and indexing
+
+## Usage
+
+1. Start the FastAPI server: `python app.py`
+2. Open `http://localhost:8000` in a modern web browser
+3. Grant camera permissions or upload images to start editing
+4. Images are automatically indexed for similarity search
 
 ## Outputs 
