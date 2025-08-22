@@ -3,30 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Whimsical Photobooth ✨</title>
-    <link rel="stylesheet" href="static/style.css">
+    <title>Minimal Photobooth</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Floating bubbles background -->
-    <div class="bubbles">
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
+    <!-- Subtle floating elements -->
+    <div class="floating-elements">
+        <div class="float-element"></div>
+        <div class="float-element"></div>
+        <div class="float-element"></div>
     </div>
 
     <!-- Header -->
     <header class="app-header">
         <h1 class="logo">
-            <span class="camera-icon">📸</span>
-            <span class="logo-text">Whimsical Booth</span>
-            <span class="sparkle">✨</span>
+            <span class="logo-text">photobooth</span>
         </h1>
         <div class="session-info">
-            <span id="sessionId">Session: New</span>
-            <button id="newSession" class="btn btn-ghost">🔄 New Session</button>
+            <span id="sessionId">session: new</span>
+            <button id="newSession" class="btn btn-ghost">reset</button>
         </div>
     </header>
 
@@ -35,7 +30,7 @@
         <!-- Left Panel - Camera & Upload -->
         <div class="panel camera-panel">
             <div class="panel-header">
-                <h2>📷 Capture Magic</h2>
+                <h2>capture</h2>
             </div>
             
             <!-- Camera/Upload Section -->
@@ -49,36 +44,33 @@
                 </div>
                 
                 <div class="capture-controls">
-                    <button id="startCamera" class="btn btn-primary">📹 Start Camera</button>
-                    <button id="capturePhoto" class="btn btn-accent" style="display: none;">📸 Snap!</button>
-                    <button id="stopCamera" class="btn btn-secondary" style="display: none;">⏹️ Stop</button>
+                    <button id="startCamera" class="btn btn-primary">start camera</button>
+                    <button id="capturePhoto" class="btn btn-accent" style="display: none;">capture</button>
+                    <button id="stopCamera" class="btn btn-secondary" style="display: none;">stop</button>
                 </div>
                 
                 <div class="upload-section">
                     <div class="upload-zone" id="uploadZone">
                         <input type="file" id="fileInput" accept="image/*" multiple>
                         <div class="upload-content">
-                            <span class="upload-icon">🖼️</span>
-                            <p>Drop images here or click to browse</p>
-                            <small>Support multiple files</small>
+                            <span class="upload-icon">+</span>
+                            <p>drop images or browse</p>
+                            <small>multiple files supported</small>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Fun Stats -->
+            <!-- Minimal Stats -->
             <div class="stats-mini">
                 <div class="stat-item">
-                    <span class="stat-emoji">📊</span>
-                    <span>Photos: <span id="photoCount">0</span></span>
+                    <span>photos: <span id="photoCount">0</span></span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-emoji">🎨</span>
-                    <span>Filters: <span id="filtersUsed">0</span></span>
+                    <span>filters: <span id="filtersUsed">0</span></span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-emoji">⚡</span>
-                    <span>Strips: <span id="stripsCreated">0</span></span>
+                    <span>strips: <span id="stripsCreated">0</span></span>
                 </div>
             </div>
         </div>
@@ -86,63 +78,57 @@
         <!-- Center Panel - Preview & Filters -->
         <div class="panel preview-panel">
             <div class="panel-header">
-                <h2>🎨 Style Studio</h2>
+                <h2>style</h2>
             </div>
             
             <!-- Image Preview -->
             <div class="image-preview" id="imagePreview">
                 <div class="preview-placeholder">
-                    <span class="placeholder-icon">🖼️</span>
-                    <p>Your masterpiece appears here</p>
+                    <span class="placeholder-icon">○</span>
+                    <p>your image appears here</p>
                 </div>
             </div>
             
             <!-- Filter Controls -->
             <div class="filter-section">
-                <h3>✨ Magic Filters</h3>
+                <h3>filters</h3>
                 <div class="filter-grid">
-                    <button class="filter-btn" data-filter="none">
-                        <span class="filter-emoji">🌈</span>
-                        <span>Original</span>
+                    <button class="filter-btn active" data-filter="none">
+                        <span>original</span>
                     </button>
                     <button class="filter-btn" data-filter="vintage">
-                        <span class="filter-emoji">📜</span>
-                        <span>Vintage</span>
+                        <span>vintage</span>
                     </button>
                     <button class="filter-btn" data-filter="bw">
-                        <span class="filter-emoji">⚫</span>
-                        <span>B&W</span>
+                        <span>mono</span>
                     </button>
                     <button class="filter-btn" data-filter="blur">
-                        <span class="filter-emoji">💫</span>
-                        <span>Dreamy</span>
+                        <span>soft</span>
                     </button>
                     <button class="filter-btn" data-filter="enhance">
-                        <span class="filter-emoji">✨</span>
-                        <span>Vibrant</span>
+                        <span>vibrant</span>
                     </button>
                     <button class="filter-btn" data-filter="retro">
-                        <span class="filter-emoji">🕺</span>
-                        <span>Retro</span>
+                        <span>retro</span>
                     </button>
                 </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <button id="processImage" class="btn btn-primary">🎭 Apply Magic</button>
-                <button id="saveImage" class="btn btn-accent">💾 Save Image</button>
-                <button id="createStrip" class="btn btn-gradient">🎞️ Make Strip</button>
+                <button id="processImage" class="btn btn-primary">apply</button>
+                <button id="saveImage" class="btn btn-accent">save</button>
+                <button id="createStrip" class="btn btn-gradient">create strip</button>
             </div>
         </div>
 
         <!-- Right Panel - Gallery & Features -->
         <div class="panel gallery-panel">
             <div class="panel-header">
-                <h2>🖼️ Gallery</h2>
+                <h2>gallery</h2>
                 <div class="panel-controls">
-                    <button id="refreshGallery" class="btn btn-ghost btn-sm">🔄</button>
-                    <button id="clearGallery" class="btn btn-ghost btn-sm">🗑️</button>
+                    <button id="refreshGallery" class="btn btn-ghost btn-sm">refresh</button>
+                    <button id="clearGallery" class="btn btn-ghost btn-sm">clear</button>
                 </div>
             </div>
             
@@ -151,32 +137,28 @@
                 <!-- Images will be populated here -->
             </div>
             
-            <!-- Fun Features -->
+            <!-- Minimal Features -->
             <div class="fun-features">
                 <div class="feature-tabs">
-                    <button class="tab-btn active" data-tab="templates">🎨 Templates</button>
-                    <button class="tab-btn" data-tab="frames">🖼️ Frames</button>
-                    <button class="tab-btn" data-tab="stickers">🎭 Stickers</button>
+                    <button class="tab-btn active" data-tab="templates">templates</button>
+                    <button class="tab-btn" data-tab="frames">frames</button>
+                    <button class="tab-btn" data-tab="effects">effects</button>
                 </div>
                 
                 <!-- Templates Tab -->
                 <div class="tab-content active" id="templates">
                     <div class="template-grid">
                         <div class="template-item" data-template="collage">
-                            <span class="template-emoji">🎨</span>
-                            <span>Collage</span>
+                            <span>collage</span>
                         </div>
                         <div class="template-item" data-template="mirror">
-                            <span class="template-emoji">🪞</span>
-                            <span>Mirror</span>
+                            <span>mirror</span>
                         </div>
                         <div class="template-item" data-template="split">
-                            <span class="template-emoji">✂️</span>
-                            <span>Split</span>
+                            <span>split</span>
                         </div>
                         <div class="template-item" data-template="grid">
-                            <span class="template-emoji">⚏</span>
-                            <span>Grid</span>
+                            <span>grid</span>
                         </div>
                     </div>
                 </div>
@@ -184,24 +166,20 @@
                 <!-- Frames Tab -->
                 <div class="tab-content" id="frames">
                     <div class="frame-grid">
-                        <div class="frame-item" data-frame="polaroid">📷 Polaroid</div>
-                        <div class="frame-item" data-frame="vintage">🖼️ Vintage</div>
-                        <div class="frame-item" data-frame="modern">✨ Modern</div>
-                        <div class="frame-item" data-frame="film">🎞️ Film Strip</div>
+                        <div class="frame-item" data-frame="classic">classic</div>
+                        <div class="frame-item" data-frame="minimal">minimal</div>
+                        <div class="frame-item" data-frame="modern">modern</div>
+                        <div class="frame-item" data-frame="film">film</div>
                     </div>
                 </div>
                 
-                <!-- Stickers Tab -->
-                <div class="tab-content" id="stickers">
-                    <div class="sticker-grid">
-                        <span class="sticker-item" data-sticker="heart">💖</span>
-                        <span class="sticker-item" data-sticker="star">⭐</span>
-                        <span class="sticker-item" data-sticker="rainbow">🌈</span>
-                        <span class="sticker-item" data-sticker="party">🎉</span>
-                        <span class="sticker-item" data-sticker="fire">🔥</span>
-                        <span class="sticker-item" data-sticker="cool">😎</span>
-                        <span class="sticker-item" data-sticker="cute">🥰</span>
-                        <span class="sticker-item" data-sticker="sparkle">✨</span>
+                <!-- Effects Tab -->
+                <div class="tab-content" id="effects">
+                    <div class="effect-grid">
+                        <div class="effect-item" data-effect="fade">fade</div>
+                        <div class="effect-item" data-effect="glow">glow</div>
+                        <div class="effect-item" data-effect="shadow">shadow</div>
+                        <div class="effect-item" data-effect="texture">texture</div>
                     </div>
                 </div>
             </div>
@@ -211,17 +189,17 @@
     <!-- Bottom Panel - Photo Strip Preview -->
     <div class="strip-preview" id="stripPreview">
         <div class="strip-header">
-            <h3>🎞️ Photo Strip Preview</h3>
+            <h3>photo strip</h3>
             <div class="strip-controls">
-                <button id="downloadStrip" class="btn btn-accent btn-sm">📥 Download</button>
-                <button id="shareStrip" class="btn btn-primary btn-sm">🔗 Share</button>
-                <button id="printStrip" class="btn btn-secondary btn-sm">🖨️ Print</button>
+                <button id="downloadStrip" class="btn btn-accent btn-sm">download</button>
+                <button id="shareStrip" class="btn btn-primary btn-sm">share</button>
+                <button id="printStrip" class="btn btn-secondary btn-sm">print</button>
             </div>
         </div>
         <div class="strip-container" id="stripContainer">
             <div class="strip-placeholder">
-                <span class="strip-emoji">🎞️</span>
-                <p>Create your first photo strip!</p>
+                <span class="strip-icon">—</span>
+                <p>create your first strip</p>
             </div>
         </div>
     </div>
@@ -229,12 +207,12 @@
     <!-- Floating Action Button -->
     <div class="fab-container">
         <button class="fab" id="magicFab">
-            <span class="fab-icon">✨</span>
+            <span class="fab-icon">+</span>
         </button>
         <div class="fab-menu">
-            <button class="fab-option" data-action="random-filter">🎲 Random Filter</button>
-            <button class="fab-option" data-action="auto-enhance">🔮 Auto Enhance</button>
-            <button class="fab-option" data-action="surprise-me">🎉 Surprise Me!</button>
+            <button class="fab-option" data-action="random-filter">random</button>
+            <button class="fab-option" data-action="auto-enhance">enhance</button>
+            <button class="fab-option" data-action="surprise-me">surprise</button>
         </div>
     </div>
 
@@ -245,13 +223,10 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="loading-spinner"></div>
-            <p>Creating magic... ✨</p>
+            <p>processing...</p>
         </div>
     </div>
 
-    <!-- Confetti Canvas -->
-    <canvas id="confetti"></canvas>
-
-    <script src="static/script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
