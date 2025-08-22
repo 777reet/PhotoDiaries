@@ -1,6 +1,6 @@
 # Photobooth Studio
 
-A modern web-based photobooth application built with vanilla JavaScript and CSS. Capture photos through your webcam or upload images, apply real-time filters, create photo strips, and manage your photo gallery.
+A modern web-based photobooth application built with vanilla Python JavaScript and CSS. Capture photos through your webcam or upload images, apply real-time filters, create photo strips, and manage your photo gallery.
 
 ## Features
 
