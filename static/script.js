@@ -1,4 +1,4 @@
-// Enhanced Photobooth Application
+// Enhanced Photobooth Application - FIXED VERSION
 class PhotoboothApp {
     constructor() {
         this.currentImage = null;
@@ -16,6 +16,15 @@ class PhotoboothApp {
     }
     
     init() {
+        // Wait for DOM to be fully ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initializeApp());
+        } else {
+            this.initializeApp();
+        }
+    }
+    
+    initializeApp() {
         this.setupCanvas();
         this.bindEvents();
         this.updateSessionId();
@@ -28,7 +37,9 @@ class PhotoboothApp {
     
     setupCanvas() {
         this.canvas = document.getElementById('canvas');
-        this.ctx = this.canvas.getContext('2d');
+        if (this.canvas) {
+            this.ctx = this.canvas.getContext('2d');
+        }
     }
     
     generateSessionId() {
@@ -36,68 +47,136 @@ class PhotoboothApp {
     }
     
     updateSessionId() {
-        document.getElementById('sessionId').textContent = `session: ${this.sessionId}`;
+        const sessionElement = document.getElementById('sessionId');
+        if (sessionElement) {
+            sessionElement.textContent = `session: ${this.sessionId}`;
+        }
     }
     
     bindEvents() {
-        // Camera controls
-        document.getElementById('startCamera').addEventListener('click', () => this.startCamera());
-        document.getElementById('capturePhoto').addEventListener('click', () => this.capturePhoto());
-        document.getElementById('stopCamera').addEventListener('click', () => this.stopCamera());
+        // Camera controls - with null checks
+        this.safeAddEventListener('startCamera', 'click', () => this.startCamera());
+        this.safeAddEventListener('capturePhoto', 'click', () => this.capturePhoto());
+        this.safeAddEventListener('stopCamera', 'click', () => this.stopCamera());
         
-        // Upload
+        // Upload with null checks
         const uploadZone = document.getElementById('uploadZone');
         const fileInput = document.getElementById('fileInput');
         
-        uploadZone.addEventListener('dragover', (e) => this.handleDragOver(e));
-        uploadZone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
-        uploadZone.addEventListener('drop', (e) => this.handleDrop(e));
-        uploadZone.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+        if (uploadZone && fileInput) {
+            uploadZone.addEventListener('dragover', (e) => this.handleDragOver(e));
+            uploadZone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+            uploadZone.addEventListener('drop', (e) => this.handleDrop(e));
+            uploadZone.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+        }
         
-        // Filter buttons
+        // Filter buttons - Enhanced error handling
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.selectFilter(e));
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    if (e && e.currentTarget) {
+                        this.selectFilter(e);
+                    }
+                });
+            }
         });
         
-        // Action buttons
-        document.getElementById('processImage').addEventListener('click', () => this.processImage());
-        document.getElementById('saveImage').addEventListener('click', () => this.saveImage());
-        document.getElementById('createStrip').addEventListener('click', () => this.createPhotoStrip());
+        // Action buttons with null checks
+        this.safeAddEventListener('processImage', 'click', () => this.processImage());
+        this.safeAddEventListener('saveImage', 'click', () => this.saveImage());
+        this.safeAddEventListener('createStrip', 'click', () => this.createPhotoStrip());
         
-        // Gallery controls
-        document.getElementById('refreshGallery').addEventListener('click', () => this.refreshGallery());
-        document.getElementById('clearGallery').addEventListener('click', () => this.clearGallery());
+        // Gallery controls with null checks
+        this.safeAddEventListener('refreshGallery', 'click', () => this.refreshGallery());
+        this.safeAddEventListener('clearGallery', 'click', () => this.clearGallery());
         
         // Tab switching
         document.querySelectorAll('.tab-btn').forEach(tab => {
-            tab.addEventListener('click', (e) => this.switchTab(e));
+            if (tab) {
+                tab.addEventListener('click', (e) => {
+                    if (e && e.currentTarget) {
+                        this.switchTab(e);
+                    }
+                });
+            }
         });
         
-        // Feature options
+        // Feature options - Enhanced error handling
         document.querySelectorAll('.option-card').forEach(option => {
-            option.addEventListener('click', (e) => this.selectOption(e));
+            if (option) {
+                option.addEventListener('click', (e) => {
+                    if (e && e.currentTarget) {
+                        this.selectOption(e);
+                    }
+                });
+            }
         });
         
-        // Strip controls
-        document.getElementById('downloadStrip').addEventListener('click', () => this.downloadStrip());
-        document.getElementById('shareStrip').addEventListener('click', () => this.shareStrip());
-        document.getElementById('printStrip').addEventListener('click', () => this.printStrip());
+        // Strip controls with null checks
+        this.safeAddEventListener('downloadStrip', 'click', () => this.downloadStrip());
+        this.safeAddEventListener('shareStrip', 'click', () => this.shareStrip());
+        this.safeAddEventListener('printStrip', 'click', () => this.printStrip());
         
         // FAB and magic menu
-        document.getElementById('magicFab').addEventListener('click', () => this.toggleMagicMenu());
+        this.safeAddEventListener('magicFab', 'click', () => this.toggleMagicMenu());
+        
         document.querySelectorAll('.option-enhanced').forEach(option => {
-            option.addEventListener('click', (e) => this.handleMagicAction(e));
+            if (option) {
+                option.addEventListener('click', (e) => {
+                    if (e && e.currentTarget) {
+                        this.handleMagicAction(e);
+                    }
+                });
+            }
         });
         
         // Session reset
-        document.getElementById('newSession').addEventListener('click', () => this.newSession());
+        this.safeAddEventListener('newSession', 'click', () => this.newSession());
         
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
         
         // Resize handling
         window.addEventListener('resize', () => this.handleResize());
+    }
+    
+    // Utility method for safe event listener addition
+    safeAddEventListener(elementId, event, callback) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.addEventListener(event, callback);
+        } else {
+            console.warn(`Element with ID '${elementId}' not found`);
+        }
+    }
+    
+    // Utility methods for safe class manipulation
+    safeAddClass(element, className) {
+        if (element && element.classList) {
+            element.classList.add(className);
+        }
+    }
+    
+    safeRemoveClass(element, className) {
+        if (element && element.classList) {
+            element.classList.remove(className);
+        }
+    }
+    
+    // Utility method for safe display updates
+    safeUpdateDisplay(elementId, displayValue) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.style.display = displayValue;
+        }
+    }
+    
+    safeDisableButton(buttonId) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            button.disabled = true;
+        }
     }
     
     // Camera functionality
@@ -115,6 +194,10 @@ class PhotoboothApp {
             
             this.stream = await navigator.mediaDevices.getUserMedia(constraints);
             const video = document.getElementById('video');
+            if (!video) {
+                throw new Error('Video element not found');
+            }
+            
             video.srcObject = this.stream;
             
             await new Promise(resolve => {
@@ -124,13 +207,16 @@ class PhotoboothApp {
                 };
             });
             
-            // Update UI
-            document.getElementById('startCamera').style.display = 'none';
-            document.getElementById('capturePhoto').style.display = 'block';
-            document.getElementById('stopCamera').style.display = 'block';
+            // Update UI safely
+            this.safeUpdateDisplay('startCamera', 'none');
+            this.safeUpdateDisplay('capturePhoto', 'block');
+            this.safeUpdateDisplay('stopCamera', 'block');
             
             // Add camera active animation
-            document.querySelector('.camera-preview').classList.add('breathing-element');
+            const cameraPreview = document.querySelector('.camera-preview');
+            if (cameraPreview) {
+                this.safeAddClass(cameraPreview, 'breathing-element');
+            }
             
             this.hideLoading();
             this.showToast('Camera ready!', 'success');
@@ -146,6 +232,11 @@ class PhotoboothApp {
         const video = document.getElementById('video');
         const canvas = this.canvas;
         const ctx = this.ctx;
+        
+        if (!video || !canvas || !ctx) {
+            this.showToast('Camera not properly initialized', 'error');
+            return;
+        }
         
         // Set canvas dimensions
         canvas.width = video.videoWidth;
@@ -170,10 +261,13 @@ class PhotoboothApp {
         this.showToast('Photo captured!', 'success');
         
         // Add bounce animation to capture button
-        document.getElementById('capturePhoto').classList.add('animate-bounce');
-        setTimeout(() => {
-            document.getElementById('capturePhoto').classList.remove('animate-bounce');
-        }, 600);
+        const captureBtn = document.getElementById('capturePhoto');
+        if (captureBtn) {
+            this.safeAddClass(captureBtn, 'animate-bounce');
+            setTimeout(() => {
+                this.safeRemoveClass(captureBtn, 'animate-bounce');
+            }, 600);
+        }
     }
     
     stopCamera() {
@@ -183,15 +277,20 @@ class PhotoboothApp {
         }
         
         const video = document.getElementById('video');
-        video.srcObject = null;
+        if (video) {
+            video.srcObject = null;
+        }
         
-        // Update UI
-        document.getElementById('startCamera').style.display = 'block';
-        document.getElementById('capturePhoto').style.display = 'none';
-        document.getElementById('stopCamera').style.display = 'none';
+        // Update UI safely
+        this.safeUpdateDisplay('startCamera', 'block');
+        this.safeUpdateDisplay('capturePhoto', 'none');
+        this.safeUpdateDisplay('stopCamera', 'none');
         
         // Remove camera animation
-        document.querySelector('.camera-preview').classList.remove('breathing-element');
+        const cameraPreview = document.querySelector('.camera-preview');
+        if (cameraPreview) {
+            this.safeRemoveClass(cameraPreview, 'breathing-element');
+        }
         
         this.showToast('Camera stopped', 'info');
     }
@@ -200,19 +299,28 @@ class PhotoboothApp {
     handleDragOver(e) {
         e.preventDefault();
         e.stopPropagation();
-        document.getElementById('uploadZone').classList.add('dragover');
+        const uploadZone = document.getElementById('uploadZone');
+        if (uploadZone) {
+            this.safeAddClass(uploadZone, 'dragover');
+        }
     }
     
     handleDragLeave(e) {
         e.preventDefault();
         e.stopPropagation();
-        document.getElementById('uploadZone').classList.remove('dragover');
+        const uploadZone = document.getElementById('uploadZone');
+        if (uploadZone) {
+            this.safeRemoveClass(uploadZone, 'dragover');
+        }
     }
     
     handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
-        document.getElementById('uploadZone').classList.remove('dragover');
+        const uploadZone = document.getElementById('uploadZone');
+        if (uploadZone) {
+            this.safeRemoveClass(uploadZone, 'dragover');
+        }
         
         const files = Array.from(e.dataTransfer.files);
         this.processFiles(files);
@@ -254,10 +362,13 @@ class PhotoboothApp {
         this.showToast(`${imageFiles.length} image(s) uploaded!`, 'success');
         
         // Add upload success animation
-        document.getElementById('uploadZone').classList.add('animate-pulse');
-        setTimeout(() => {
-            document.getElementById('uploadZone').classList.remove('animate-pulse');
-        }, 2000);
+        const uploadZone = document.getElementById('uploadZone');
+        if (uploadZone) {
+            this.safeAddClass(uploadZone, 'animate-pulse');
+            setTimeout(() => {
+                this.safeRemoveClass(uploadZone, 'animate-pulse');
+            }, 2000);
+        }
     }
     
     fileToDataURL(file) {
@@ -272,7 +383,9 @@ class PhotoboothApp {
     // Image loading and display
     loadImageFromData(imageData) {
         const preview = document.getElementById('imagePreview');
-        preview.innerHTML = `<img src="${imageData}" alt="Preview" class="animate-bounce" />`;
+        if (preview) {
+            preview.innerHTML = `<img src="${imageData}" alt="Preview" class="animate-bounce" />`;
+        }
         this.currentImage = imageData;
         
         // Enable action buttons
@@ -280,28 +393,38 @@ class PhotoboothApp {
     }
     
     enableActionButtons() {
-        document.getElementById('processImage').disabled = false;
-        document.getElementById('saveImage').disabled = false;
-        document.getElementById('createStrip').disabled = false;
+        const processBtn = document.getElementById('processImage');
+        const saveBtn = document.getElementById('saveImage');
+        const createStripBtn = document.getElementById('createStrip');
+        
+        if (processBtn) processBtn.disabled = false;
+        if (saveBtn) saveBtn.disabled = false;
+        if (createStripBtn) createStripBtn.disabled = false;
     }
     
-    // Filter functionality
+    // Filter functionality - FIXED with better null checks
     selectFilter(e) {
-        // Remove active class from all filters
+        // Enhanced null check for event target
+        if (!e || !e.currentTarget) {
+            console.warn('selectFilter called with invalid event target');
+            return;
+        }
+        
+        // Remove active class from all filters safely
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.classList.remove('active');
+            this.safeRemoveClass(btn, 'active');
         });
         
         // Add active class to clicked filter
-        e.currentTarget.classList.add('active');
+        this.safeAddClass(e.currentTarget, 'active');
         
         // Update current filter
-        this.currentFilter = e.currentTarget.dataset.filter;
+        this.currentFilter = e.currentTarget.dataset.filter || 'none';
         
         // Add filter selection animation
-        e.currentTarget.classList.add('animate-bounce');
+        this.safeAddClass(e.currentTarget, 'animate-bounce');
         setTimeout(() => {
-            e.currentTarget.classList.remove('animate-bounce');
+            this.safeRemoveClass(e.currentTarget, 'animate-bounce');
         }, 600);
         
         // Auto-apply filter if image is loaded
@@ -326,7 +449,9 @@ class PhotoboothApp {
             
             // Update preview
             const preview = document.getElementById('imagePreview');
-            preview.innerHTML = `<img src="${filteredImage}" alt="Filtered Preview" class="animate-glow" />`;
+            if (preview) {
+                preview.innerHTML = `<img src="${filteredImage}" alt="Filtered Preview" class="animate-glow" />`;
+            }
             
             this.currentImage = filteredImage;
             this.updateStats('filters', 1);
@@ -466,10 +591,13 @@ class PhotoboothApp {
         this.showToast('Image saved!', 'success');
         
         // Add save animation
-        document.getElementById('saveImage').classList.add('animate-pulse');
-        setTimeout(() => {
-            document.getElementById('saveImage').classList.remove('animate-pulse');
-        }, 2000);
+        const saveBtn = document.getElementById('saveImage');
+        if (saveBtn) {
+            this.safeAddClass(saveBtn, 'animate-pulse');
+            setTimeout(() => {
+                this.safeRemoveClass(saveBtn, 'animate-pulse');
+            }, 2000);
+        }
     }
     
     // Gallery functionality
@@ -484,6 +612,8 @@ class PhotoboothApp {
     
     updateGalleryDisplay() {
         const grid = document.getElementById('galleryGrid');
+        if (!grid) return;
+        
         grid.innerHTML = '';
         
         this.gallery.forEach((item, index) => {
@@ -496,14 +626,18 @@ class PhotoboothApp {
                 this.showToast('Image loaded from gallery', 'success');
                 
                 // Add selection animation
-                div.classList.add('animate-bounce');
-                setTimeout(() => div.classList.remove('animate-bounce'), 600);
+                this.safeAddClass(div, 'animate-bounce');
+                setTimeout(() => {
+                    this.safeRemoveClass(div, 'animate-bounce');
+                }, 600);
             });
             
             // Add staggered animation
             div.style.animationDelay = `${index * 0.1}s`;
-            div.classList.add('animate-bounce');
-            setTimeout(() => div.classList.remove('animate-bounce'), 600 + (index * 100));
+            this.safeAddClass(div, 'animate-bounce');
+            setTimeout(() => {
+                this.safeRemoveClass(div, 'animate-bounce');
+            }, 600 + (index * 100));
             
             grid.appendChild(div);
         });
@@ -518,10 +652,13 @@ class PhotoboothApp {
         this.showToast('Gallery refreshed', 'info');
         
         // Add refresh animation
-        document.getElementById('refreshGallery').classList.add('animate-glow');
-        setTimeout(() => {
-            document.getElementById('refreshGallery').classList.remove('animate-glow');
-        }, 2000);
+        const refreshBtn = document.getElementById('refreshGallery');
+        if (refreshBtn) {
+            this.safeAddClass(refreshBtn, 'animate-glow');
+            setTimeout(() => {
+                this.safeRemoveClass(refreshBtn, 'animate-glow');
+            }, 2000);
+        }
     }
     
     clearGallery() {
@@ -539,38 +676,62 @@ class PhotoboothApp {
         this.updateStatsDisplay();
     }
     
-    // Tab functionality
+    // Tab functionality - FIXED
     switchTab(e) {
-        const tabName = e.currentTarget.dataset.tab;
+        if (!e || !e.currentTarget) {
+            console.warn('switchTab called with invalid event target');
+            return;
+        }
         
-        // Remove active from all tabs and content
+        const tabName = e.currentTarget.dataset.tab;
+        if (!tabName) return;
+        
+        // Remove active from all tabs and content safely
         document.querySelectorAll('.tab-btn').forEach(tab => {
-            tab.classList.remove('active');
+            this.safeRemoveClass(tab, 'active');
         });
         document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
+            this.safeRemoveClass(content, 'active');
         });
         
         // Add active to clicked tab and corresponding content
-        e.currentTarget.classList.add('active');
-        document.getElementById(tabName).classList.add('active');
+        this.safeAddClass(e.currentTarget, 'active');
+        
+        const tabContent = document.getElementById(tabName);
+        if (tabContent) {
+            this.safeAddClass(tabContent, 'active');
+        }
         
         // Add tab switch animation
-        e.currentTarget.classList.add('animate-bounce');
+        this.safeAddClass(e.currentTarget, 'animate-bounce');
         setTimeout(() => {
-            e.currentTarget.classList.remove('animate-bounce');
+            this.safeRemoveClass(e.currentTarget, 'animate-bounce');
         }, 600);
     }
     
-    // Feature option selection
+    // Feature option selection - FIXED with better error handling
     selectOption(e) {
-        const type = e.currentTarget.parentElement.parentElement.id;
+        // Enhanced null check for event target
+        if (!e || !e.currentTarget) {
+            console.warn('selectOption called with invalid event target');
+            return;
+        }
+        
+        const parentElement = e.currentTarget.parentElement;
+        const grandParentElement = parentElement ? parentElement.parentElement : null;
+        
+        if (!grandParentElement || !grandParentElement.id) {
+            console.warn('selectOption: Could not find valid parent elements');
+            return;
+        }
+        
+        const type = grandParentElement.id;
         const value = e.currentTarget.dataset[type.slice(0, -1)];
         
-        // Visual feedback
-        e.currentTarget.classList.add('animate-pulse');
+        // Visual feedback with safe class manipulation
+        this.safeAddClass(e.currentTarget, 'animate-pulse');
         setTimeout(() => {
-            e.currentTarget.classList.remove('animate-pulse');
+            this.safeRemoveClass(e.currentTarget, 'animate-pulse');
         }, 2000);
         
         this.showToast(`${type.slice(0, -1)}: ${value} selected`, 'success');
@@ -603,18 +764,20 @@ class PhotoboothApp {
         
         setTimeout(() => {
             const stripContainer = document.getElementById('stripContainer');
-            stripContainer.innerHTML = this.generateStripHTML(stripImages);
+            if (stripContainer) {
+                stripContainer.innerHTML = this.generateStripHTML(stripImages);
+                
+                // Add strip creation animation
+                this.safeAddClass(stripContainer, 'animate-glow');
+                setTimeout(() => {
+                    this.safeRemoveClass(stripContainer, 'animate-glow');
+                }, 3000);
+            }
             
             this.stripImages = stripImages;
             this.updateStats('strips', 1);
             this.hideLoading();
             this.showToast('Photo strip created!', 'success');
-            
-            // Add strip creation animation
-            stripContainer.classList.add('animate-glow');
-            setTimeout(() => {
-                stripContainer.classList.remove('animate-glow');
-            }, 3000);
         }, 1500);
     }
     
@@ -711,16 +874,38 @@ class PhotoboothApp {
         printWindow.document.write(`
             <html>
                 <head>
-                    <title>Photo Strip</title>
+                    <title>Photo Strip Print</title>
                     <style>
-                        body { margin: 0; padding: 20px; text-align: center; }
-                        .photo-strip { display: flex; gap: 4px; justify-content: center; }
-                        .strip-image { width: 150px; height: 200px; object-fit: cover; }
-                        @media print { body { margin: 0; } }
+                        body { 
+                            margin: 0; 
+                            padding: 20px; 
+                            text-align: center; 
+                            font-family: Arial, sans-serif;
+                        }
+                        .photo-strip { 
+                            display: flex; 
+                            gap: 4px; 
+                            justify-content: center; 
+                            margin: 20px auto;
+                        }
+                        .strip-image { 
+                            width: 150px; 
+                            height: 200px; 
+                            object-fit: cover; 
+                            border: 1px solid #ccc;
+                        }
+                        @media print { 
+                            body { margin: 0; padding: 10px; }
+                            .photo-strip { margin: 10px auto; }
+                        }
                     </style>
                 </head>
                 <body>
+                    <h2>Photobooth Strip</h2>
                     ${stripHTML}
+                    <p style="margin-top: 20px; font-size: 12px; color: #666;">
+                        Generated on ${new Date().toLocaleDateString()}
+                    </p>
                 </body>
             </html>
         `);
@@ -737,15 +922,24 @@ class PhotoboothApp {
         const menu = document.querySelector('.menu-enhanced');
         const fab = document.getElementById('magicFab');
         
-        menu.classList.toggle('active');
-        
-        if (menu.classList.contains('active')) {
-            fab.classList.add('animate-bounce');
-            setTimeout(() => fab.classList.remove('animate-bounce'), 600);
+        if (menu) {
+            menu.classList.toggle('active');
+            
+            if (menu.classList.contains('active') && fab) {
+                this.safeAddClass(fab, 'animate-bounce');
+                setTimeout(() => {
+                    this.safeRemoveClass(fab, 'animate-bounce');
+                }, 600);
+            }
         }
     }
     
     handleMagicAction(e) {
+        if (!e || !e.currentTarget) {
+            console.warn('handleMagicAction called with invalid event target');
+            return;
+        }
+        
         const action = e.currentTarget.dataset.action;
         
         switch (action) {
@@ -761,7 +955,10 @@ class PhotoboothApp {
         }
         
         // Close menu
-        document.querySelector('.menu-enhanced').classList.remove('active');
+        const menu = document.querySelector('.menu-enhanced');
+        if (menu) {
+            this.safeRemoveClass(menu, 'active');
+        }
     }
     
     applyRandomFilter() {
@@ -769,7 +966,10 @@ class PhotoboothApp {
         const randomFilter = filters[Math.floor(Math.random() * filters.length)];
         
         // Select the filter
-        document.querySelector(`[data-filter="${randomFilter}"]`).click();
+        const filterBtn = document.querySelector(`[data-filter="${randomFilter}"]`);
+        if (filterBtn) {
+            filterBtn.click();
+        }
         
         this.showToast(`Random filter: ${randomFilter}!`, 'success');
     }
@@ -781,7 +981,10 @@ class PhotoboothApp {
         }
         
         // Apply enhance filter
-        document.querySelector('[data-filter="enhance"]').click();
+        const enhanceBtn = document.querySelector('[data-filter="enhance"]');
+        if (enhanceBtn) {
+            enhanceBtn.click();
+        }
         this.showToast('Auto-enhanced!', 'success');
     }
     
@@ -827,7 +1030,9 @@ class PhotoboothApp {
             });
             
             setTimeout(() => {
-                document.body.removeChild(confetti);
+                if (document.body.contains(confetti)) {
+                    document.body.removeChild(confetti);
+                }
             }, fallDuration * 1000);
         }
     }
@@ -877,7 +1082,9 @@ class PhotoboothApp {
             });
             
             setTimeout(() => {
-                document.body.removeChild(sparkle);
+                if (document.body.contains(sparkle)) {
+                    document.body.removeChild(sparkle);
+                }
             }, 2000);
         }
     }
@@ -886,13 +1093,15 @@ class PhotoboothApp {
         const elements = document.querySelectorAll('.panel, .btn, .filter-btn, .option-card');
         elements.forEach((el, index) => {
             setTimeout(() => {
-                el.classList.add('animate-bounce');
-                setTimeout(() => el.classList.remove('animate-bounce'), 600);
+                this.safeAddClass(el, 'animate-bounce');
+                setTimeout(() => {
+                    this.safeRemoveClass(el, 'animate-bounce');
+                }, 600);
             }, index * 100);
         });
     }
     
-    // Missing utility methods
+    // Utility methods
     addCaptureFlash() {
         const flash = document.createElement('div');
         flash.style.position = 'fixed';
@@ -917,20 +1126,28 @@ class PhotoboothApp {
         });
         
         setTimeout(() => {
-            document.body.removeChild(flash);
+            if (document.body.contains(flash)) {
+                document.body.removeChild(flash);
+            }
         }, 200);
     }
     
     showLoading(message = 'loading...') {
         const overlay = document.getElementById('loadingOverlay');
-        const text = overlay.querySelector('.loading-text');
-        text.textContent = message;
-        overlay.style.display = 'flex';
+        if (overlay) {
+            const text = overlay.querySelector('.loading-text');
+            if (text) {
+                text.textContent = message;
+            }
+            overlay.style.display = 'flex';
+        }
     }
     
     hideLoading() {
         const overlay = document.getElementById('loadingOverlay');
-        overlay.style.display = 'none';
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
     }
     
     showToast(message, type = 'info') {
@@ -943,11 +1160,13 @@ class PhotoboothApp {
         container.appendChild(toast);
         
         // Animate in
-        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            this.safeAddClass(toast, 'show');
+        }, 10);
         
         // Remove after 3 seconds
         setTimeout(() => {
-            toast.classList.remove('show');
+            this.safeRemoveClass(toast, 'show');
             setTimeout(() => {
                 if (container.contains(toast)) {
                     container.removeChild(toast);
@@ -979,9 +1198,13 @@ class PhotoboothApp {
     }
     
     updateStatsDisplay() {
-        document.getElementById('photoCount').textContent = this.stats.photos;
-        document.getElementById('filtersUsed').textContent = this.stats.filters;
-        document.getElementById('stripsCreated').textContent = this.stats.strips;
+        const photoCountEl = document.getElementById('photoCount');
+        const filtersUsedEl = document.getElementById('filtersUsed');
+        const stripsCreatedEl = document.getElementById('stripsCreated');
+        
+        if (photoCountEl) photoCountEl.textContent = this.stats.photos;
+        if (filtersUsedEl) filtersUsedEl.textContent = this.stats.filters;
+        if (stripsCreatedEl) stripsCreatedEl.textContent = this.stats.strips;
     }
     
     loadGallery() {
@@ -1025,27 +1248,35 @@ class PhotoboothApp {
         // Reset UI
         this.updateGalleryDisplay();
         this.updateStatsDisplay();
-        document.getElementById('imagePreview').innerHTML = `
-            <div class="preview-placeholder floating-placeholder">
-                <div class="placeholder-content">
-                    <span class="placeholder-icon breathing-circle">○</span>
-                    <p class="placeholder-text">your image appears here</p>
-                    <div class="placeholder-hint">upload or capture to begin</div>
-                </div>
-            </div>
-        `;
-        document.getElementById('stripContainer').innerHTML = `
-            <div class="strip-placeholder placeholder-modern">
-                <span class="strip-icon animated-strip">—</span>
-                <p class="strip-text">create your first strip</p>
-                <small class="strip-hint">combine multiple photos</small>
-            </div>
-        `;
         
-        // Disable action buttons
-        document.getElementById('processImage').disabled = true;
-        document.getElementById('saveImage').disabled = true;
-        document.getElementById('createStrip').disabled = true;
+        const imagePreview = document.getElementById('imagePreview');
+        if (imagePreview) {
+            imagePreview.innerHTML = `
+                <div class="preview-placeholder floating-placeholder">
+                    <div class="placeholder-content">
+                        <span class="placeholder-icon breathing-circle">○</span>
+                        <p class="placeholder-text">your image appears here</p>
+                        <div class="placeholder-hint">upload or capture to begin</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const stripContainer = document.getElementById('stripContainer');
+        if (stripContainer) {
+            stripContainer.innerHTML = `
+                <div class="strip-placeholder placeholder-modern">
+                    <span class="strip-icon animated-strip">—</span>
+                    <p class="strip-text">create your first strip</p>
+                    <small class="strip-hint">combine multiple photos</small>
+                </div>
+            `;
+        }
+        
+        // Disable action buttons safely
+        this.safeDisableButton('processImage');
+        this.safeDisableButton('saveImage');
+        this.safeDisableButton('createStrip');
         
         this.showToast('New session started!', 'success');
     }
@@ -1060,8 +1291,11 @@ class PhotoboothApp {
     }
     
     handleKeyboardShortcuts(e) {
+        if (!e) return;
+        
         // Space = capture photo (if camera is active)
-        if (e.code === 'Space' && document.getElementById('capturePhoto').style.display !== 'none') {
+        const captureBtn = document.getElementById('capturePhoto');
+        if (e.code === 'Space' && captureBtn && captureBtn.style.display !== 'none') {
             e.preventDefault();
             this.capturePhoto();
         }
@@ -1099,9 +1333,9 @@ class PhotoboothApp {
     handleResize() {
         // Handle window resize events
         if (this.stream) {
-            // Adjust video preview if needed
-            const video = document.getElementById('video');
             // Video will maintain aspect ratio automatically
+            const video = document.getElementById('video');
+            // Additional resize handling could go here if needed
         }
     }
     
@@ -1114,12 +1348,16 @@ class PhotoboothApp {
         // Start ambient background animations
         const orbs = document.querySelectorAll('.bg-orb');
         orbs.forEach((orb, index) => {
-            orb.style.animationDelay = `${index * 2}s`;
+            if (orb && orb.style) {
+                orb.style.animationDelay = `${index * 2}s`;
+            }
         });
         
         const floaters = document.querySelectorAll('.float-element');
         floaters.forEach((el, index) => {
-            el.style.animationDelay = `${index * 1.5}s`;
+            if (el && el.style) {
+                el.style.animationDelay = `${index * 1.5}s`;
+            }
         });
     }
     
@@ -1127,7 +1365,9 @@ class PhotoboothApp {
         // Additional floating animations for enhanced experience
         const elements = document.querySelectorAll('.floating-placeholder, .breathing-circle');
         elements.forEach(el => {
-            el.style.animation = 'float 3s ease-in-out infinite';
+            if (el && el.style) {
+                el.style.animation = 'float 3s ease-in-out infinite';
+            }
         });
     }
 }
