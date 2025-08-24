@@ -1,4 +1,3 @@
-// Enhanced Photobooth Application - FIXED VERSION
 class PhotoboothApp {
     constructor() {
         this.currentImage = null;
@@ -11,12 +10,12 @@ class PhotoboothApp {
         this.canvas = null;
         this.ctx = null;
         this.isProcessing = false;
+        this.magicMenuOpen = false;
         
         this.init();
     }
     
     init() {
-        // Wait for DOM to be fully ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.initializeApp());
         } else {
@@ -25,25 +24,35 @@ class PhotoboothApp {
     }
     
     initializeApp() {
-        this.setupCanvas();
-        this.bindEvents();
-        this.updateSessionId();
-        this.loadGallery();
-        this.initializeFeatures();
-        this.setupMagicEffects();
-        this.startAmbientAnimations();
-        this.updateStatsDisplay();
+        try {
+            this.setupCanvas();
+            this.bindEvents();
+            this.updateSessionId();
+            this.updateStatsDisplay();
+            this.startAmbientAnimations();
+            this.setupKeyboardShortcuts();
+        } catch (error) {
+            console.error('Failed to initialize app:', error);
+            this.showToast('Application failed to initialize', 'error');
+        }
     }
     
     setupCanvas() {
         this.canvas = document.getElementById('canvas');
         if (this.canvas) {
             this.ctx = this.canvas.getContext('2d');
+        } else {
+            console.warn('Canvas element not found');
         }
     }
     
     generateSessionId() {
-        return Math.random().toString(36).substring(2, 8).toUpperCase();
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < 6; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
     }
     
     updateSessionId() {
@@ -54,95 +63,64 @@ class PhotoboothApp {
     }
     
     bindEvents() {
-        // Camera controls - with null checks
-        this.safeAddEventListener('startCamera', 'click', () => this.startCamera());
-        this.safeAddEventListener('capturePhoto', 'click', () => this.capturePhoto());
-        this.safeAddEventListener('stopCamera', 'click', () => this.stopCamera());
+        // Camera controls
+        this.addEventListener('startCamera', 'click', this.startCamera.bind(this));
+        this.addEventListener('capturePhoto', 'click', this.capturePhoto.bind(this));
+        this.addEventListener('stopCamera', 'click', this.stopCamera.bind(this));
         
-        // Upload with null checks
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
+        // File upload
+        this.setupFileUpload();
         
-        if (uploadZone && fileInput) {
-            uploadZone.addEventListener('dragover', (e) => this.handleDragOver(e));
-            uploadZone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
-            uploadZone.addEventListener('drop', (e) => this.handleDrop(e));
-            uploadZone.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
-        }
-        
-        // Filter buttons - Enhanced error handling
+        // Filter selection
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            if (btn) {
-                btn.addEventListener('click', (e) => {
-                    if (e && e.currentTarget) {
-                        this.selectFilter(e);
-                    }
-                });
-            }
+            btn.addEventListener('click', (e) => this.selectFilter(e));
         });
         
-        // Action buttons with null checks
-        this.safeAddEventListener('processImage', 'click', () => this.processImage());
-        this.safeAddEventListener('saveImage', 'click', () => this.saveImage());
-        this.safeAddEventListener('createStrip', 'click', () => this.createPhotoStrip());
+        // Action buttons
+        this.addEventListener('processImage', 'click', this.processImage.bind(this));
+        this.addEventListener('saveImage', 'click', this.saveImage.bind(this));
+        this.addEventListener('createStrip', 'click', this.createPhotoStrip.bind(this));
         
-        // Gallery controls with null checks
-        this.safeAddEventListener('refreshGallery', 'click', () => this.refreshGallery());
-        this.safeAddEventListener('clearGallery', 'click', () => this.clearGallery());
+        // Gallery controls
+        this.addEventListener('refreshGallery', 'click', this.refreshGallery.bind(this));
+        this.addEventListener('clearGallery', 'click', this.clearGallery.bind(this));
         
         // Tab switching
         document.querySelectorAll('.tab-btn').forEach(tab => {
-            if (tab) {
-                tab.addEventListener('click', (e) => {
-                    if (e && e.currentTarget) {
-                        this.switchTab(e);
-                    }
-                });
-            }
+            tab.addEventListener('click', (e) => this.switchTab(e));
         });
         
-        // Feature options - Enhanced error handling
+        // Feature options
         document.querySelectorAll('.option-card').forEach(option => {
-            if (option) {
-                option.addEventListener('click', (e) => {
-                    if (e && e.currentTarget) {
-                        this.selectOption(e);
-                    }
-                });
-            }
+            option.addEventListener('click', (e) => this.selectOption(e));
         });
         
-        // Strip controls with null checks
-        this.safeAddEventListener('downloadStrip', 'click', () => this.downloadStrip());
-        this.safeAddEventListener('shareStrip', 'click', () => this.shareStrip());
-        this.safeAddEventListener('printStrip', 'click', () => this.printStrip());
+        // Strip controls
+        this.addEventListener('downloadStrip', 'click', this.downloadStrip.bind(this));
+        this.addEventListener('shareStrip', 'click', this.shareStrip.bind(this));
+        this.addEventListener('printStrip', 'click', this.printStrip.bind(this));
         
-        // FAB and magic menu
-        this.safeAddEventListener('magicFab', 'click', () => this.toggleMagicMenu());
-        
-        document.querySelectorAll('.option-enhanced').forEach(option => {
-            if (option) {
-                option.addEventListener('click', (e) => {
-                    if (e && e.currentTarget) {
-                        this.handleMagicAction(e);
-                    }
-                });
-            }
+        // Magic FAB
+        this.addEventListener('magicFab', 'click', this.toggleMagicMenu.bind(this));
+        document.querySelectorAll('.fab-option').forEach(option => {
+            option.addEventListener('click', (e) => this.handleMagicAction(e));
         });
         
         // Session reset
-        this.safeAddEventListener('newSession', 'click', () => this.newSession());
+        this.addEventListener('newSession', 'click', this.newSession.bind(this));
         
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
+        // Window events
+        window.addEventListener('resize', this.handleResize.bind(this));
         
-        // Resize handling
-        window.addEventListener('resize', () => this.handleResize());
+        // Click outside to close magic menu
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.fab-container') && this.magicMenuOpen) {
+                this.closeMagicMenu();
+            }
+        });
     }
     
-    // Utility method for safe event listener addition
-    safeAddEventListener(elementId, event, callback) {
+    addEventListener(elementId, event, callback) {
         const element = document.getElementById(elementId);
         if (element) {
             element.addEventListener(event, callback);
@@ -151,123 +129,132 @@ class PhotoboothApp {
         }
     }
     
-    // Utility methods for safe class manipulation
-    safeAddClass(element, className) {
-        if (element && element.classList) {
-            element.classList.add(className);
-        }
+    setupFileUpload() {
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        
+        if (!uploadZone || !fileInput) return;
+        
+        // Drag and drop events
+        uploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
+        uploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        uploadZone.addEventListener('drop', this.handleDrop.bind(this));
+        
+        // Click to upload
+        uploadZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
     }
     
-    safeRemoveClass(element, className) {
-        if (element && element.classList) {
-            element.classList.remove(className);
-        }
-    }
-    
-    // Utility method for safe display updates
-    safeUpdateDisplay(elementId, displayValue) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.style.display = displayValue;
-        }
-    }
-    
-    safeDisableButton(buttonId) {
-        const button = document.getElementById(buttonId);
-        if (button) {
-            button.disabled = true;
-        }
+    setupKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 's':
+                        e.preventDefault();
+                        this.saveImage();
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        this.newSession();
+                        break;
+                }
+            }
+            
+            switch (e.key) {
+                case ' ':
+                    e.preventDefault();
+                    this.capturePhoto();
+                    break;
+                case 'Escape':
+                    this.closeMagicMenu();
+                    break;
+            }
+        });
     }
     
     // Camera functionality
     async startCamera() {
         try {
-            this.showLoading('starting camera...');
+            this.showLoading('Starting camera...');
             
             const constraints = {
                 video: {
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 },
+                    width: { ideal: 1920, max: 1920 },
+                    height: { ideal: 1080, max: 1080 },
                     facingMode: 'user'
                 }
             };
             
             this.stream = await navigator.mediaDevices.getUserMedia(constraints);
             const video = document.getElementById('video');
+            
             if (!video) {
                 throw new Error('Video element not found');
             }
             
             video.srcObject = this.stream;
             
-            await new Promise(resolve => {
+            await new Promise((resolve, reject) => {
                 video.onloadedmetadata = () => {
-                    video.play();
-                    resolve();
+                    video.play().then(resolve).catch(reject);
                 };
+                video.onerror = reject;
             });
             
-            // Update UI safely
-            this.safeUpdateDisplay('startCamera', 'none');
-            this.safeUpdateDisplay('capturePhoto', 'block');
-            this.safeUpdateDisplay('stopCamera', 'block');
-            
-            // Add camera active animation
-            const cameraPreview = document.querySelector('.camera-preview');
-            if (cameraPreview) {
-                this.safeAddClass(cameraPreview, 'breathing-element');
-            }
-            
+            this.updateCameraUI(true);
             this.hideLoading();
             this.showToast('Camera ready!', 'success');
             
         } catch (error) {
             console.error('Camera error:', error);
             this.hideLoading();
-            this.showToast('Camera access denied or unavailable', 'error');
+            let message = 'Camera access denied';
+            if (error.name === 'NotFoundError') {
+                message = 'No camera found';
+            } else if (error.name === 'NotAllowedError') {
+                message = 'Camera access denied';
+            } else if (error.name === 'NotReadableError') {
+                message = 'Camera is being used by another application';
+            }
+            this.showToast(message, 'error');
         }
     }
     
     capturePhoto() {
         const video = document.getElementById('video');
-        const canvas = this.canvas;
-        const ctx = this.ctx;
         
-        if (!video || !canvas || !ctx) {
+        if (!video || !this.canvas || !this.ctx) {
             this.showToast('Camera not properly initialized', 'error');
             return;
         }
         
-        // Set canvas dimensions
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        if (video.videoWidth === 0 || video.videoHeight === 0) {
+            this.showToast('Camera not ready', 'error');
+            return;
+        }
+        
+        // Set canvas dimensions to match video
+        this.canvas.width = video.videoWidth;
+        this.canvas.height = video.videoHeight;
         
         // Add capture flash effect
         this.addCaptureFlash();
         
-        // Draw video frame to canvas
-        ctx.drawImage(video, 0, 0);
+        // Draw current video frame to canvas
+        this.ctx.drawImage(video, 0, 0);
         
         // Convert to image data
-        const imageData = canvas.toDataURL('image/jpeg', 0.9);
-        this.loadImageFromData(imageData);
+        const imageData = this.canvas.toDataURL('image/jpeg', 0.9);
         
-        // Update stats
-        this.updateStats('photos', 1);
-        
-        // Add to gallery
+        // Load image and add to gallery
+        this.loadImage(imageData);
         this.addToGallery(imageData);
         
-        this.showToast('Photo captured!', 'success');
+        // Update stats
+        this.updateStats('photos');
         
-        // Add bounce animation to capture button
-        const captureBtn = document.getElementById('capturePhoto');
-        if (captureBtn) {
-            this.safeAddClass(captureBtn, 'animate-bounce');
-            setTimeout(() => {
-                this.safeRemoveClass(captureBtn, 'animate-bounce');
-            }, 600);
-        }
+        this.showToast('Photo captured!', 'success');
+        this.addButtonAnimation('capturePhoto', 'animate-bounce');
     }
     
     stopCamera() {
@@ -281,27 +268,36 @@ class PhotoboothApp {
             video.srcObject = null;
         }
         
-        // Update UI safely
-        this.safeUpdateDisplay('startCamera', 'block');
-        this.safeUpdateDisplay('capturePhoto', 'none');
-        this.safeUpdateDisplay('stopCamera', 'none');
-        
-        // Remove camera animation
-        const cameraPreview = document.querySelector('.camera-preview');
-        if (cameraPreview) {
-            this.safeRemoveClass(cameraPreview, 'breathing-element');
-        }
-        
+        this.updateCameraUI(false);
         this.showToast('Camera stopped', 'info');
     }
     
-    // Upload functionality
+    updateCameraUI(isActive) {
+        const startBtn = document.getElementById('startCamera');
+        const captureBtn = document.getElementById('capturePhoto');
+        const stopBtn = document.getElementById('stopCamera');
+        
+        if (startBtn) startBtn.style.display = isActive ? 'none' : 'block';
+        if (captureBtn) captureBtn.style.display = isActive ? 'block' : 'none';
+        if (stopBtn) stopBtn.style.display = isActive ? 'block' : 'none';
+        
+        const cameraPreview = document.querySelector('.camera-preview');
+        if (cameraPreview) {
+            if (isActive) {
+                cameraPreview.classList.add('breathing-element');
+            } else {
+                cameraPreview.classList.remove('breathing-element');
+            }
+        }
+    }
+    
+    // File upload functionality
     handleDragOver(e) {
         e.preventDefault();
         e.stopPropagation();
         const uploadZone = document.getElementById('uploadZone');
         if (uploadZone) {
-            this.safeAddClass(uploadZone, 'dragover');
+            uploadZone.classList.add('dragover');
         }
     }
     
@@ -310,16 +306,17 @@ class PhotoboothApp {
         e.stopPropagation();
         const uploadZone = document.getElementById('uploadZone');
         if (uploadZone) {
-            this.safeRemoveClass(uploadZone, 'dragover');
+            uploadZone.classList.remove('dragover');
         }
     }
     
     handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
+        
         const uploadZone = document.getElementById('uploadZone');
         if (uploadZone) {
-            this.safeRemoveClass(uploadZone, 'dragover');
+            uploadZone.classList.remove('dragover');
         }
         
         const files = Array.from(e.dataTransfer.files);
@@ -329,6 +326,8 @@ class PhotoboothApp {
     handleFileSelect(e) {
         const files = Array.from(e.target.files);
         this.processFiles(files);
+        // Clear file input for re-selection of same file
+        e.target.value = '';
     }
     
     async processFiles(files) {
@@ -339,97 +338,104 @@ class PhotoboothApp {
             return;
         }
         
-        this.showLoading('processing images...');
+        this.showLoading(`Processing ${imageFiles.length} image(s)...`);
+        
+        let processedCount = 0;
+        let errorCount = 0;
         
         for (const file of imageFiles) {
             try {
                 const imageData = await this.fileToDataURL(file);
                 this.addToGallery(imageData);
                 
-                // Load first image in preview
+                // Load first image in preview if none is loaded
                 if (!this.currentImage) {
-                    this.loadImageFromData(imageData);
+                    this.loadImage(imageData);
                 }
                 
-                this.updateStats('photos', 1);
+                this.updateStats('photos');
+                processedCount++;
             } catch (error) {
-                console.error('Error processing file:', error);
-                this.showToast(`Error processing ${file.name}`, 'error');
+                console.error(`Error processing ${file.name}:`, error);
+                errorCount++;
             }
         }
         
         this.hideLoading();
-        this.showToast(`${imageFiles.length} image(s) uploaded!`, 'success');
         
-        // Add upload success animation
-        const uploadZone = document.getElementById('uploadZone');
-        if (uploadZone) {
-            this.safeAddClass(uploadZone, 'animate-pulse');
-            setTimeout(() => {
-                this.safeRemoveClass(uploadZone, 'animate-pulse');
-            }, 2000);
+        if (processedCount > 0) {
+            this.showToast(`${processedCount} image(s) uploaded successfully!`, 'success');
         }
+        
+        if (errorCount > 0) {
+            this.showToast(`${errorCount} image(s) failed to upload`, 'error');
+        }
+        
+        this.addUploadAnimation();
     }
     
     fileToDataURL(file) {
         return new Promise((resolve, reject) => {
+            if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                reject(new Error('File too large (max 10MB)'));
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = e => resolve(e.target.result);
-            reader.onerror = reject;
+            reader.onerror = () => reject(new Error('Failed to read file'));
             reader.readAsDataURL(file);
         });
     }
     
-    // Image loading and display
-    loadImageFromData(imageData) {
+    // Image handling
+    loadImage(imageData) {
         const preview = document.getElementById('imagePreview');
-        if (preview) {
-            preview.innerHTML = `<img src="${imageData}" alt="Preview" class="animate-bounce" />`;
-        }
-        this.currentImage = imageData;
+        if (!preview) return;
         
-        // Enable action buttons
+        const img = document.createElement('img');
+        img.src = imageData;
+        img.alt = 'Preview';
+        img.style.animation = 'fadeInContent 0.4s ease-out';
+        
+        preview.innerHTML = '';
+        preview.appendChild(img);
+        
+        this.currentImage = imageData;
         this.enableActionButtons();
     }
     
     enableActionButtons() {
-        const processBtn = document.getElementById('processImage');
-        const saveBtn = document.getElementById('saveImage');
-        const createStripBtn = document.getElementById('createStrip');
-        
-        if (processBtn) processBtn.disabled = false;
-        if (saveBtn) saveBtn.disabled = false;
-        if (createStripBtn) createStripBtn.disabled = false;
+        const buttons = ['processImage', 'saveImage', 'createStrip'];
+        buttons.forEach(buttonId => {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                button.disabled = false;
+            }
+        });
     }
     
-    // Filter functionality - FIXED with better null checks
+    // Filter functionality
     selectFilter(e) {
-        // Enhanced null check for event target
-        if (!e || !e.currentTarget) {
-            console.warn('selectFilter called with invalid event target');
-            return;
-        }
+        if (!e.currentTarget) return;
         
-        // Remove active class from all filters safely
+        // Remove active class from all filters
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            this.safeRemoveClass(btn, 'active');
+            btn.classList.remove('active');
         });
         
-        // Add active class to clicked filter
-        this.safeAddClass(e.currentTarget, 'active');
+        // Add active class to selected filter
+        e.currentTarget.classList.add('active');
         
         // Update current filter
         this.currentFilter = e.currentTarget.dataset.filter || 'none';
         
-        // Add filter selection animation
-        this.safeAddClass(e.currentTarget, 'animate-bounce');
-        setTimeout(() => {
-            this.safeRemoveClass(e.currentTarget, 'animate-bounce');
-        }, 600);
+        // Add selection animation
+        this.addElementAnimation(e.currentTarget, 'animate-bounce');
         
         // Auto-apply filter if image is loaded
-        if (this.currentImage) {
-            this.processImage();
+        if (this.currentImage && !this.isProcessing) {
+            setTimeout(() => this.processImage(), 200);
         }
     }
     
@@ -442,20 +448,16 @@ class PhotoboothApp {
         if (this.isProcessing) return;
         
         this.isProcessing = true;
-        this.showLoading('applying filter...');
+        this.showLoading(`Applying ${this.currentFilter} filter...`);
         
         try {
             const filteredImage = await this.applyFilter(this.currentImage, this.currentFilter);
             
             // Update preview
-            const preview = document.getElementById('imagePreview');
-            if (preview) {
-                preview.innerHTML = `<img src="${filteredImage}" alt="Filtered Preview" class="animate-glow" />`;
-            }
-            
+            this.loadImage(filteredImage);
             this.currentImage = filteredImage;
-            this.updateStats('filters', 1);
             
+            this.updateStats('filters');
             this.hideLoading();
             this.showToast(`${this.currentFilter} filter applied!`, 'success');
             
@@ -468,109 +470,99 @@ class PhotoboothApp {
         }
     }
     
-    async applyFilter(imageData, filter) {
-        return new Promise((resolve) => {
+    async applyFilter(imageData, filterType) {
+        return new Promise((resolve, reject) => {
             const img = new Image();
+            
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                canvas.width = img.width;
-                canvas.height = img.height;
-                
-                // Apply filter based on type
-                this.applyCanvasFilter(ctx, filter);
-                
-                ctx.drawImage(img, 0, 0);
-                
-                // Get additional filter effects
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imageData.data;
-                
-                switch (filter) {
-                    case 'vintage':
-                        this.applyVintageFilter(data);
-                        break;
-                    case 'bw':
-                        this.applyBlackWhiteFilter(data);
-                        break;
-                    case 'enhance':
-                        this.applyEnhanceFilter(data);
-                        break;
-                    case 'retro':
-                        this.applyRetroFilter(data);
-                        break;
-                    case 'blur':
-                        // Blur is handled by CSS filter
-                        break;
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    // Apply CSS filter
+                    ctx.filter = this.getFilterCSS(filterType);
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Apply additional pixel manipulation for certain filters
+                    if (this.needsPixelManipulation(filterType)) {
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        this.applyPixelFilter(imageData.data, filterType);
+                        ctx.putImageData(imageData, 0, 0);
+                    }
+                    
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                } catch (error) {
+                    reject(error);
                 }
-                
-                if (filter !== 'blur' && filter !== 'none') {
-                    ctx.putImageData(imageData, 0, 0);
-                }
-                
-                resolve(canvas.toDataURL('image/jpeg', 0.9));
             };
+            
+            img.onerror = () => reject(new Error('Failed to load image for filtering'));
             img.src = imageData;
         });
     }
     
-    applyCanvasFilter(ctx, filter) {
-        switch (filter) {
+    getFilterCSS(filterType) {
+        const filters = {
+            none: 'none',
+            vintage: 'sepia(0.8) contrast(1.2) brightness(1.1) saturate(0.8)',
+            bw: 'grayscale(1) contrast(1.3)',
+            blur: 'blur(2px) brightness(1.1)',
+            enhance: 'contrast(1.3) saturate(1.4) brightness(1.1)',
+            retro: 'sepia(0.4) hue-rotate(15deg) saturate(1.2) contrast(1.1)'
+        };
+        
+        return filters[filterType] || 'none';
+    }
+    
+    needsPixelManipulation(filterType) {
+        return ['vintage', 'enhance', 'retro'].includes(filterType);
+    }
+    
+    applyPixelFilter(data, filterType) {
+        switch (filterType) {
             case 'vintage':
-                ctx.filter = 'sepia(0.8) contrast(1.2) brightness(1.1) saturate(0.8)';
-                break;
-            case 'bw':
-                ctx.filter = 'grayscale(1) contrast(1.3)';
-                break;
-            case 'blur':
-                ctx.filter = 'blur(2px) brightness(1.1)';
+                this.applyVintageEffect(data);
                 break;
             case 'enhance':
-                ctx.filter = 'contrast(1.3) saturate(1.4) brightness(1.1)';
+                this.applyEnhanceEffect(data);
                 break;
             case 'retro':
-                ctx.filter = 'sepia(0.4) hue-rotate(15deg) saturate(1.2)';
+                this.applyRetroEffect(data);
                 break;
-            default:
-                ctx.filter = 'none';
         }
     }
     
-    applyVintageFilter(data) {
+    applyVintageEffect(data) {
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
             const g = data[i + 1];
             const b = data[i + 2];
             
-            data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189) + 40);
-            data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168) + 20);
-            data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131) + 10);
+            // Vintage color matrix with warm tone
+            data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189) + 30);
+            data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168) + 15);
+            data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131) + 5);
         }
     }
     
-    applyBlackWhiteFilter(data) {
+    applyEnhanceEffect(data) {
         for (let i = 0; i < data.length; i += 4) {
-            const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-            data[i] = gray;
-            data[i + 1] = gray;
-            data[i + 2] = gray;
+            // Boost colors with slight saturation increase
+            data[i] = Math.min(255, data[i] * 1.2);
+            data[i + 1] = Math.min(255, data[i + 1] * 1.2);
+            data[i + 2] = Math.min(255, data[i + 2] * 1.2);
         }
     }
     
-    applyEnhanceFilter(data) {
+    applyRetroEffect(data) {
         for (let i = 0; i < data.length; i += 4) {
-            data[i] = Math.min(255, data[i] * 1.3);
-            data[i + 1] = Math.min(255, data[i + 1] * 1.3);
-            data[i + 2] = Math.min(255, data[i + 2] * 1.3);
-        }
-    }
-    
-    applyRetroFilter(data) {
-        for (let i = 0; i < data.length; i += 4) {
-            data[i] = Math.min(255, data[i] * 1.2 + 20);
-            data[i + 1] = Math.min(255, data[i + 1] * 1.1 + 10);
-            data[i + 2] = Math.min(255, data[i + 2] * 0.9);
+            // Retro color shift with orange tint
+            data[i] = Math.min(255, data[i] * 1.15 + 15);     // Red boost
+            data[i + 1] = Math.min(255, data[i + 1] * 1.05 + 8); // Green slight boost
+            data[i + 2] = Math.min(255, data[i + 2] * 0.9);      // Blue reduction
         }
     }
     
@@ -581,32 +573,40 @@ class PhotoboothApp {
             return;
         }
         
-        const link = document.createElement('a');
-        link.download = `photobooth-${this.sessionId}-${Date.now()}.jpg`;
-        link.href = this.currentImage;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        this.showToast('Image saved!', 'success');
-        
-        // Add save animation
-        const saveBtn = document.getElementById('saveImage');
-        if (saveBtn) {
-            this.safeAddClass(saveBtn, 'animate-pulse');
-            setTimeout(() => {
-                this.safeRemoveClass(saveBtn, 'animate-pulse');
-            }, 2000);
+        try {
+            const link = document.createElement('a');
+            link.download = `photobooth-${this.sessionId}-${Date.now()}.jpg`;
+            link.href = this.currentImage;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            this.showToast('Image saved!', 'success');
+            this.addButtonAnimation('saveImage', 'animate-pulse');
+            
+        } catch (error) {
+            console.error('Save error:', error);
+            this.showToast('Failed to save image', 'error');
         }
     }
     
     // Gallery functionality
     addToGallery(imageData) {
-        this.gallery.push({
+        const galleryItem = {
             data: imageData,
             timestamp: Date.now(),
-            filter: this.currentFilter
-        });
+            filter: this.currentFilter,
+            id: `img-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        };
+        
+        this.gallery.unshift(galleryItem); // Add to beginning
+        
+        // Limit gallery size to prevent memory issues
+        if (this.gallery.length > 50) {
+            this.gallery = this.gallery.slice(0, 50);
+        }
+        
         this.updateGalleryDisplay();
     }
     
@@ -614,51 +614,36 @@ class PhotoboothApp {
         const grid = document.getElementById('galleryGrid');
         if (!grid) return;
         
+        if (this.gallery.length === 0) {
+            grid.innerHTML = '<div class="gallery-empty">No photos yet. Start capturing!</div>';
+            return;
+        }
+        
         grid.innerHTML = '';
         
         this.gallery.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'gallery-item interactive';
-            div.innerHTML = `<img src="${item.data}" alt="Gallery image ${index + 1}" />`;
+            div.innerHTML = `<img src="${item.data}" alt="Gallery image" loading="lazy" />`;
             
             div.addEventListener('click', () => {
-                this.loadImageFromData(item.data);
+                this.loadImage(item.data);
                 this.showToast('Image loaded from gallery', 'success');
-                
-                // Add selection animation
-                this.safeAddClass(div, 'animate-bounce');
-                setTimeout(() => {
-                    this.safeRemoveClass(div, 'animate-bounce');
-                }, 600);
+                this.addElementAnimation(div, 'animate-bounce');
             });
             
-            // Add staggered animation
-            div.style.animationDelay = `${index * 0.1}s`;
-            this.safeAddClass(div, 'animate-bounce');
-            setTimeout(() => {
-                this.safeRemoveClass(div, 'animate-bounce');
-            }, 600 + (index * 100));
+            // Add staggered entrance animation
+            div.style.animationDelay = `${index * 0.05}s`;
+            div.style.animation = 'fadeInContent 0.3s ease-out forwards';
             
             grid.appendChild(div);
         });
-        
-        if (this.gallery.length === 0) {
-            grid.innerHTML = '<div class="gallery-empty">No photos yet. Start capturing!</div>';
-        }
     }
     
     refreshGallery() {
         this.updateGalleryDisplay();
         this.showToast('Gallery refreshed', 'info');
-        
-        // Add refresh animation
-        const refreshBtn = document.getElementById('refreshGallery');
-        if (refreshBtn) {
-            this.safeAddClass(refreshBtn, 'animate-glow');
-            setTimeout(() => {
-                this.safeRemoveClass(refreshBtn, 'animate-glow');
-            }, 2000);
-        }
+        this.addButtonAnimation('refreshGallery', 'animate-glow');
     }
     
     clearGallery() {
@@ -667,87 +652,66 @@ class PhotoboothApp {
             return;
         }
         
-        this.gallery = [];
-        this.updateGalleryDisplay();
-        this.showToast('Gallery cleared', 'success');
-        
-        // Reset gallery stats
-        this.stats.photos = 0;
-        this.updateStatsDisplay();
-    }
-    
-    // Tab functionality - FIXED
-    switchTab(e) {
-        if (!e || !e.currentTarget) {
-            console.warn('switchTab called with invalid event target');
+        // Confirm before clearing
+        if (!confirm('Are you sure you want to clear the gallery? This cannot be undone.')) {
             return;
         }
+        
+        this.gallery = [];
+        this.stats.photos = 0;
+        this.updateGalleryDisplay();
+        this.updateStatsDisplay();
+        this.showToast('Gallery cleared', 'success');
+    }
+    
+    // Tab functionality
+    switchTab(e) {
+        if (!e.currentTarget) return;
         
         const tabName = e.currentTarget.dataset.tab;
         if (!tabName) return;
         
-        // Remove active from all tabs and content safely
+        // Remove active from all tabs and content
         document.querySelectorAll('.tab-btn').forEach(tab => {
-            this.safeRemoveClass(tab, 'active');
+            tab.classList.remove('active');
         });
         document.querySelectorAll('.tab-content').forEach(content => {
-            this.safeRemoveClass(content, 'active');
+            content.classList.remove('active');
         });
         
-        // Add active to clicked tab and corresponding content
-        this.safeAddClass(e.currentTarget, 'active');
-        
+        // Activate clicked tab and corresponding content
+        e.currentTarget.classList.add('active');
         const tabContent = document.getElementById(tabName);
         if (tabContent) {
-            this.safeAddClass(tabContent, 'active');
+            tabContent.classList.add('active');
         }
         
-        // Add tab switch animation
-        this.safeAddClass(e.currentTarget, 'animate-bounce');
-        setTimeout(() => {
-            this.safeRemoveClass(e.currentTarget, 'animate-bounce');
-        }, 600);
+        this.addElementAnimation(e.currentTarget, 'animate-bounce');
     }
     
-    // Feature option selection - FIXED with better error handling
+    // Feature options
     selectOption(e) {
-        // Enhanced null check for event target
-        if (!e || !e.currentTarget) {
-            console.warn('selectOption called with invalid event target');
-            return;
-        }
+        if (!e.currentTarget) return;
         
-        const parentElement = e.currentTarget.parentElement;
-        const grandParentElement = parentElement ? parentElement.parentElement : null;
+        const optionType = e.currentTarget.closest('.tab-content').id;
+        const optionValue = e.currentTarget.dataset[optionType.slice(0, -1)]; // Remove 's' from end
         
-        if (!grandParentElement || !grandParentElement.id) {
-            console.warn('selectOption: Could not find valid parent elements');
-            return;
-        }
+        this.addElementAnimation(e.currentTarget, 'animate-pulse');
+        this.showToast(`${optionType.slice(0, -1)}: ${optionValue} selected`, 'success');
         
-        const type = grandParentElement.id;
-        const value = e.currentTarget.dataset[type.slice(0, -1)];
-        
-        // Visual feedback with safe class manipulation
-        this.safeAddClass(e.currentTarget, 'animate-pulse');
-        setTimeout(() => {
-            this.safeRemoveClass(e.currentTarget, 'animate-pulse');
-        }, 2000);
-        
-        this.showToast(`${type.slice(0, -1)}: ${value} selected`, 'success');
-        
-        // Apply feature based on type
-        this.applyFeature(type, value);
+        // Apply feature effect
+        this.applyFeatureEffect(optionType, optionValue);
     }
     
-    applyFeature(type, value) {
+    applyFeatureEffect(type, value) {
         if (!this.currentImage) {
             this.showToast('Please select an image first', 'error');
             return;
         }
         
-        // This could be extended to apply actual effects
+        // Placeholder for feature effects
         console.log(`Applying ${type}: ${value}`);
+        this.showToast(`${value} effect applied!`, 'info');
     }
     
     // Photo strip functionality
@@ -757,37 +721,30 @@ class PhotoboothApp {
             return;
         }
         
-        this.showLoading('creating photo strip...');
+        this.showLoading('Creating photo strip...');
         
-        // Take last 4 images or all if less than 4
-        const stripImages = this.gallery.slice(-4).map(item => item.data);
+        // Take last 4 images for strip
+        const stripImages = this.gallery.slice(0, 4).map(item => item.data);
         
         setTimeout(() => {
-            const stripContainer = document.getElementById('stripContainer');
-            if (stripContainer) {
-                stripContainer.innerHTML = this.generateStripHTML(stripImages);
-                
-                // Add strip creation animation
-                this.safeAddClass(stripContainer, 'animate-glow');
-                setTimeout(() => {
-                    this.safeRemoveClass(stripContainer, 'animate-glow');
-                }, 3000);
-            }
-            
+            this.generatePhotoStrip(stripImages);
             this.stripImages = stripImages;
-            this.updateStats('strips', 1);
+            this.updateStats('strips');
             this.hideLoading();
             this.showToast('Photo strip created!', 'success');
-        }, 1500);
+        }, 1000);
     }
     
-    generateStripHTML(images) {
+    generatePhotoStrip(images) {
+        const container = document.getElementById('stripContainer');
+        if (!container) return;
+        
         const stripHTML = images.map((img, index) => 
             `<img src="${img}" alt="Strip image ${index + 1}" class="strip-image" 
-             style="animation-delay: ${index * 0.2}s" />`
+             style="animation-delay: ${index * 0.1}s; animation: fadeInContent 0.5s ease-out forwards;" />`
         ).join('');
         
-        return `<div class="photo-strip animate-bounce">${stripHTML}</div>`;
+        container.innerHTML = `<div class="photo-strip animate-glow">${stripHTML}</div>`;
     }
     
     downloadStrip() {
@@ -796,45 +753,57 @@ class PhotoboothApp {
             return;
         }
         
-        this.showLoading('preparing download...');
+        this.showLoading('Preparing download...');
         
-        // Create composite image
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Set strip dimensions
-        const stripWidth = 800;
-        const stripHeight = 200;
-        const imageWidth = stripWidth / this.stripImages.length;
-        
-        canvas.width = stripWidth;
-        canvas.height = stripHeight;
-        
-        // White background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, stripWidth, stripHeight);
-        
-        let loadedImages = 0;
-        this.stripImages.forEach((imgData, index) => {
-            const img = new Image();
-            img.onload = () => {
-                ctx.drawImage(img, index * imageWidth, 0, imageWidth, stripHeight);
-                loadedImages++;
-                
-                if (loadedImages === this.stripImages.length) {
-                    // Download
-                    const link = document.createElement('a');
-                    link.download = `photo-strip-${this.sessionId}-${Date.now()}.jpg`;
-                    link.href = canvas.toDataURL('image/jpeg', 0.9);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+        this.createStripCanvas().then(canvas => {
+            const link = document.createElement('a');
+            link.download = `photo-strip-${this.sessionId}-${Date.now()}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            this.hideLoading();
+            this.showToast('Strip downloaded!', 'success');
+        }).catch(error => {
+            console.error('Download error:', error);
+            this.hideLoading();
+            this.showToast('Failed to download strip', 'error');
+        });
+    }
+    
+    createStripCanvas() {
+        return new Promise((resolve, reject) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const stripWidth = 1200;
+            const stripHeight = 300;
+            const imageWidth = stripWidth / this.stripImages.length;
+            
+            canvas.width = stripWidth;
+            canvas.height = stripHeight;
+            
+            // White background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, stripWidth, stripHeight);
+            
+            let loadedCount = 0;
+            
+            this.stripImages.forEach((imgData, index) => {
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, index * imageWidth, 0, imageWidth, stripHeight);
+                    loadedCount++;
                     
-                    this.hideLoading();
-                    this.showToast('Strip downloaded!', 'success');
-                }
-            };
-            img.src = imgData;
+                    if (loadedCount === this.stripImages.length) {
+                        resolve(canvas);
+                    }
+                };
+                img.onerror = () => reject(new Error(`Failed to load strip image ${index}`));
+                img.src = imgData;
+            });
         });
     }
     
@@ -844,21 +813,31 @@ class PhotoboothApp {
             return;
         }
         
-        // Simple share functionality
         if (navigator.share) {
             navigator.share({
-                title: 'My Photo Strip',
-                text: 'Check out my photobooth strip!'
+                title: 'My Photobooth Strip',
+                text: 'Check out my photobooth strip!',
+                url: window.location.href
             }).then(() => {
                 this.showToast('Shared successfully!', 'success');
-            }).catch(() => {
-                this.showToast('Share cancelled', 'info');
+            }).catch(error => {
+                console.log('Share cancelled or failed:', error);
+                this.fallbackShare();
             });
         } else {
-            // Fallback - copy link
+            this.fallbackShare();
+        }
+    }
+    
+    fallbackShare() {
+        if (navigator.clipboard) {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 this.showToast('Link copied to clipboard!', 'success');
+            }).catch(() => {
+                this.showToast('Unable to share', 'error');
             });
+        } else {
+            this.showToast('Sharing not supported on this browser', 'info');
         }
     }
     
@@ -869,76 +848,71 @@ class PhotoboothApp {
         }
         
         const printWindow = window.open('', '_blank');
-        const stripHTML = this.generateStripHTML(this.stripImages);
+        const stripHTML = this.stripImages.map((img, index) => 
+            `<img src="${img}" alt="Strip ${index + 1}" class="strip-image" />`
+        ).join('');
         
         printWindow.document.write(`
+            <!DOCTYPE html>
             <html>
-                <head>
-                    <title>Photo Strip Print</title>
-                    <style>
-                        body { 
-                            margin: 0; 
-                            padding: 20px; 
-                            text-align: center; 
-                            font-family: Arial, sans-serif;
-                        }
-                        .photo-strip { 
-                            display: flex; 
-                            gap: 4px; 
-                            justify-content: center; 
-                            margin: 20px auto;
-                        }
-                        .strip-image { 
-                            width: 150px; 
-                            height: 200px; 
-                            object-fit: cover; 
-                            border: 1px solid #ccc;
-                        }
-                        @media print { 
-                            body { margin: 0; padding: 10px; }
-                            .photo-strip { margin: 10px auto; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <h2>Photobooth Strip</h2>
-                    ${stripHTML}
-                    <p style="margin-top: 20px; font-size: 12px; color: #666;">
-                        Generated on ${new Date().toLocaleDateString()}
-                    </p>
-                </body>
+            <head>
+                <title>Photobooth Strip - Print</title>
+                <style>
+                    body { margin: 20px; font-family: Arial, sans-serif; text-align: center; }
+                    .photo-strip { display: flex; gap: 4px; justify-content: center; margin: 20px 0; }
+                    .strip-image { width: 150px; height: 200px; object-fit: cover; border: 1px solid #ccc; }
+                    .print-info { margin-top: 20px; font-size: 12px; color: #666; }
+                    @media print { 
+                        body { margin: 10px; }
+                        .photo-strip { margin: 10px 0; }
+                    }
+                </style>
+            </head>
+            <body>
+                <h2>Photobooth Strip</h2>
+                <div class="photo-strip">${stripHTML}</div>
+                <div class="print-info">
+                    Session: ${this.sessionId} | Generated: ${new Date().toLocaleDateString()}
+                </div>
+            </body>
             </html>
         `);
         
         printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
         
-        this.showToast('Printing...', 'info');
+        printWindow.onload = () => {
+            printWindow.focus();
+            printWindow.print();
+        };
+        
+        this.showToast('Opening print dialog...', 'info');
     }
     
     // Magic FAB functionality
     toggleMagicMenu() {
-        const menu = document.querySelector('.menu-enhanced');
-        const fab = document.getElementById('magicFab');
+        const menu = document.querySelector('.fab-menu');
+        if (!menu) return;
         
+        this.magicMenuOpen = !this.magicMenuOpen;
+        
+        if (this.magicMenuOpen) {
+            menu.classList.add('active');
+            this.addElementAnimation(document.getElementById('magicFab'), 'animate-bounce');
+        } else {
+            menu.classList.remove('active');
+        }
+    }
+    
+    closeMagicMenu() {
+        const menu = document.querySelector('.fab-menu');
         if (menu) {
-            menu.classList.toggle('active');
-            
-            if (menu.classList.contains('active') && fab) {
-                this.safeAddClass(fab, 'animate-bounce');
-                setTimeout(() => {
-                    this.safeRemoveClass(fab, 'animate-bounce');
-                }, 600);
-            }
+            menu.classList.remove('active');
+            this.magicMenuOpen = false;
         }
     }
     
     handleMagicAction(e) {
-        if (!e || !e.currentTarget) {
-            console.warn('handleMagicAction called with invalid event target');
-            return;
-        }
+        if (!e.currentTarget) return;
         
         const action = e.currentTarget.dataset.action;
         
@@ -952,26 +926,22 @@ class PhotoboothApp {
             case 'surprise-me':
                 this.surpriseMe();
                 break;
+            default:
+                console.warn('Unknown magic action:', action);
         }
         
-        // Close menu
-        const menu = document.querySelector('.menu-enhanced');
-        if (menu) {
-            this.safeRemoveClass(menu, 'active');
-        }
+        this.closeMagicMenu();
     }
     
     applyRandomFilter() {
         const filters = ['vintage', 'bw', 'blur', 'enhance', 'retro'];
         const randomFilter = filters[Math.floor(Math.random() * filters.length)];
         
-        // Select the filter
         const filterBtn = document.querySelector(`[data-filter="${randomFilter}"]`);
         if (filterBtn) {
             filterBtn.click();
+            this.showToast(`Random filter: ${randomFilter}!`, 'success');
         }
-        
-        this.showToast(`Random filter: ${randomFilter}!`, 'success');
     }
     
     autoEnhance() {
@@ -980,15 +950,14 @@ class PhotoboothApp {
             return;
         }
         
-        // Apply enhance filter
         const enhanceBtn = document.querySelector('[data-filter="enhance"]');
         if (enhanceBtn) {
             enhanceBtn.click();
+            this.showToast('Auto-enhanced!', 'success');
         }
-        this.showToast('Auto-enhanced!', 'success');
     }
     
-    async surpriseMe() {
+    surpriseMe() {
         const surprises = [
             () => this.createConfetti(),
             () => this.triggerRandomColorScheme(),
@@ -999,41 +968,56 @@ class PhotoboothApp {
         const randomSurprise = surprises[Math.floor(Math.random() * surprises.length)];
         randomSurprise();
         
-        this.showToast('Surprise!', 'success');
+        this.showToast('Surprise activated!', 'success');
     }
     
     // Fun effects
     createConfetti() {
-        const colors = ['#a8b5a0', '#c4967a', '#d4c4b0', '#e8ddd0'];
+        const colors = ['#a8b5a0', '#c4967a', '#d4c4b0', '#e8ddd0', '#f5f2ed'];
+        const confettiCount = 60;
         
-        for (let i = 0; i < 50; i++) {
-            const confetti = document.createElement('div');
-            confetti.style.position = 'fixed';
-            confetti.style.width = '10px';
-            confetti.style.height = '10px';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.left = Math.random() * window.innerWidth + 'px';
-            confetti.style.top = '-10px';
-            confetti.style.zIndex = '9999';
-            confetti.style.borderRadius = '50%';
-            confetti.style.pointerEvents = 'none';
-            
-            document.body.appendChild(confetti);
-            
-            const fallDuration = Math.random() * 3 + 2;
-            confetti.animate([
-                { transform: 'translateY(0px) rotate(0deg)', opacity: 1 },
-                { transform: `translateY(${window.innerHeight + 20}px) rotate(360deg)`, opacity: 0 }
-            ], {
-                duration: fallDuration * 1000,
-                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-            });
-            
+        for (let i = 0; i < confettiCount; i++) {
             setTimeout(() => {
-                if (document.body.contains(confetti)) {
-                    document.body.removeChild(confetti);
-                }
-            }, fallDuration * 1000);
+                const confetti = document.createElement('div');
+                
+                Object.assign(confetti.style, {
+                    position: 'fixed',
+                    width: Math.random() * 8 + 4 + 'px',
+                    height: Math.random() * 8 + 4 + 'px',
+                    backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+                    left: Math.random() * window.innerWidth + 'px',
+                    top: '-20px',
+                    zIndex: '9999',
+                    borderRadius: Math.random() > 0.5 ? '50%' : '0',
+                    pointerEvents: 'none',
+                    transform: `rotate(${Math.random() * 360}deg)`
+                });
+                
+                document.body.appendChild(confetti);
+                
+                const fallDuration = Math.random() * 3000 + 2000;
+                const horizontalDrift = (Math.random() - 0.5) * 100;
+                
+                confetti.animate([
+                    { 
+                        transform: `translateY(0px) translateX(0px) rotate(0deg)`,
+                        opacity: 1 
+                    },
+                    { 
+                        transform: `translateY(${window.innerHeight + 50}px) translateX(${horizontalDrift}px) rotate(360deg)`,
+                        opacity: 0 
+                    }
+                ], {
+                    duration: fallDuration,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+                
+                setTimeout(() => {
+                    if (document.body.contains(confetti)) {
+                        document.body.removeChild(confetti);
+                    }
+                }, fallDuration);
+            }, i * 50);
         }
     }
     
@@ -1041,12 +1025,14 @@ class PhotoboothApp {
         const schemes = [
             { '--sage-accent': '#ff6b6b', '--terracotta': '#4ecdc4', '--taupe': '#45b7d1' },
             { '--sage-accent': '#96ceb4', '--terracotta': '#feca57', '--taupe': '#ff9ff3' },
-            { '--sage-accent': '#fd79a8', '--terracotta': '#6c5ce7', '--taupe': '#a29bfe' }
+            { '--sage-accent': '#fd79a8', '--terracotta': '#6c5ce7', '--taupe': '#a29bfe' },
+            { '--sage-accent': '#00d2d3', '--terracotta': '#ff9f43', '--taupe': '#ee5a6f' }
         ];
         
         const randomScheme = schemes[Math.floor(Math.random() * schemes.length)];
         const root = document.documentElement;
         
+        // Apply color scheme
         Object.entries(randomScheme).forEach(([property, value]) => {
             root.style.setProperty(property, value);
         });
@@ -1060,198 +1046,94 @@ class PhotoboothApp {
     }
     
     addSparkleEffect() {
-        for (let i = 0; i < 20; i++) {
-            const sparkle = document.createElement('div');
-            sparkle.innerHTML = '✨';
-            sparkle.style.position = 'fixed';
-            sparkle.style.left = Math.random() * window.innerWidth + 'px';
-            sparkle.style.top = Math.random() * window.innerHeight + 'px';
-            sparkle.style.zIndex = '9999';
-            sparkle.style.fontSize = Math.random() * 20 + 15 + 'px';
-            sparkle.style.pointerEvents = 'none';
-            
-            document.body.appendChild(sparkle);
-            
-            sparkle.animate([
-                { transform: 'scale(0) rotate(0deg)', opacity: 0 },
-                { transform: 'scale(1) rotate(180deg)', opacity: 1 },
-                { transform: 'scale(0) rotate(360deg)', opacity: 0 }
-            ], {
-                duration: 2000,
-                easing: 'ease-in-out'
-            });
-            
+        const sparkleCount = 25;
+        const sparkleEmojis = ['✨', '⭐', '🌟', '💫'];
+        
+        for (let i = 0; i < sparkleCount; i++) {
             setTimeout(() => {
-                if (document.body.contains(sparkle)) {
-                    document.body.removeChild(sparkle);
-                }
-            }, 2000);
+                const sparkle = document.createElement('div');
+                
+                Object.assign(sparkle.style, {
+                    position: 'fixed',
+                    left: Math.random() * window.innerWidth + 'px',
+                    top: Math.random() * window.innerHeight + 'px',
+                    zIndex: '9999',
+                    fontSize: Math.random() * 15 + 15 + 'px',
+                    pointerEvents: 'none',
+                    userSelect: 'none'
+                });
+                
+                sparkle.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+                document.body.appendChild(sparkle);
+                
+                sparkle.animate([
+                    { 
+                        transform: 'scale(0) rotate(0deg)', 
+                        opacity: 0 
+                    },
+                    { 
+                        transform: 'scale(1.2) rotate(180deg)', 
+                        opacity: 1,
+                        offset: 0.5 
+                    },
+                    { 
+                        transform: 'scale(0) rotate(360deg)', 
+                        opacity: 0 
+                    }
+                ], {
+                    duration: 2500,
+                    easing: 'ease-in-out'
+                });
+                
+                setTimeout(() => {
+                    if (document.body.contains(sparkle)) {
+                        document.body.removeChild(sparkle);
+                    }
+                }, 2500);
+            }, i * 80);
         }
     }
     
     bounceAllElements() {
-        const elements = document.querySelectorAll('.panel, .btn, .filter-btn, .option-card');
+        const elements = document.querySelectorAll('.panel, .btn, .filter-btn, .option-card, .gallery-item');
+        
         elements.forEach((el, index) => {
             setTimeout(() => {
-                this.safeAddClass(el, 'animate-bounce');
-                setTimeout(() => {
-                    this.safeRemoveClass(el, 'animate-bounce');
-                }, 600);
-            }, index * 100);
+                this.addElementAnimation(el, 'animate-bounce');
+            }, index * 50);
         });
     }
     
-    // Utility methods
-    addCaptureFlash() {
-        const flash = document.createElement('div');
-        flash.style.position = 'fixed';
-        flash.style.top = '0';
-        flash.style.left = '0';
-        flash.style.width = '100vw';
-        flash.style.height = '100vh';
-        flash.style.backgroundColor = 'white';
-        flash.style.opacity = '0.8';
-        flash.style.zIndex = '9999';
-        flash.style.pointerEvents = 'none';
-        
-        document.body.appendChild(flash);
-        
-        flash.animate([
-            { opacity: 0 },
-            { opacity: 0.8 },
-            { opacity: 0 }
-        ], {
-            duration: 200,
-            easing: 'ease-out'
-        });
-        
-        setTimeout(() => {
-            if (document.body.contains(flash)) {
-                document.body.removeChild(flash);
-            }
-        }, 200);
-    }
-    
-    showLoading(message = 'loading...') {
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-            const text = overlay.querySelector('.loading-text');
-            if (text) {
-                text.textContent = message;
-            }
-            overlay.style.display = 'flex';
-        }
-    }
-    
-    hideLoading() {
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
-    }
-    
-    showToast(message, type = 'info') {
-        const container = document.getElementById('toastContainer') || this.createToastContainer();
-        
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        
-        container.appendChild(toast);
-        
-        // Animate in
-        setTimeout(() => {
-            this.safeAddClass(toast, 'show');
-        }, 10);
-        
-        // Remove after 3 seconds
-        setTimeout(() => {
-            this.safeRemoveClass(toast, 'show');
-            setTimeout(() => {
-                if (container.contains(toast)) {
-                    container.removeChild(toast);
-                }
-            }, 300);
-        }, 3000);
-    }
-    
-    createToastContainer() {
-        const container = document.createElement('div');
-        container.id = 'toastContainer';
-        container.className = 'toast-container toast-modern';
-        container.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        `;
-        document.body.appendChild(container);
-        return container;
-    }
-    
-    updateStats(type, increment) {
-        this.stats[type] += increment;
-        this.updateStatsDisplay();
-    }
-    
-    updateStatsDisplay() {
-        const photoCountEl = document.getElementById('photoCount');
-        const filtersUsedEl = document.getElementById('filtersUsed');
-        const stripsCreatedEl = document.getElementById('stripsCreated');
-        
-        if (photoCountEl) photoCountEl.textContent = this.stats.photos;
-        if (filtersUsedEl) filtersUsedEl.textContent = this.stats.filters;
-        if (stripsCreatedEl) stripsCreatedEl.textContent = this.stats.strips;
-    }
-    
-    loadGallery() {
-        // Try to load from localStorage if available (for persistence)
-        try {
-            const saved = localStorage.getItem(`photobooth_${this.sessionId}`);
-            if (saved) {
-                const data = JSON.parse(saved);
-                this.gallery = data.gallery || [];
-                this.stats = data.stats || { photos: 0, filters: 0, strips: 0 };
-                this.updateGalleryDisplay();
-                this.updateStatsDisplay();
-            }
-        } catch (error) {
-            console.log('No saved gallery data');
-        }
-    }
-    
-    saveGallery() {
-        // Save to localStorage for persistence
-        try {
-            const data = {
-                gallery: this.gallery,
-                stats: this.stats,
-                timestamp: Date.now()
-            };
-            localStorage.setItem(`photobooth_${this.sessionId}`, JSON.stringify(data));
-        } catch (error) {
-            console.warn('Could not save gallery data');
-        }
-    }
-    
+    // Session management
     newSession() {
+        if (!confirm('Start a new session? This will clear the current gallery and reset stats.')) {
+            return;
+        }
+        
         this.sessionId = this.generateSessionId();
-        this.updateSessionId();
         this.gallery = [];
         this.stripImages = [];
         this.currentImage = null;
+        this.currentFilter = 'none';
         this.stats = { photos: 0, filters: 0, strips: 0 };
         
         // Reset UI
-        this.updateGalleryDisplay();
+        this.updateSessionId();
         this.updateStatsDisplay();
+        this.updateGalleryDisplay();
+        this.clearImagePreview();
+        this.resetFilterSelection();
         
-        const imagePreview = document.getElementById('imagePreview');
-        if (imagePreview) {
-            imagePreview.innerHTML = `
+        // Stop camera if running
+        this.stopCamera();
+        
+        this.showToast('New session started!', 'success');
+    }
+    
+    clearImagePreview() {
+        const preview = document.getElementById('imagePreview');
+        if (preview) {
+            preview.innerHTML = `
                 <div class="preview-placeholder floating-placeholder">
                     <div class="placeholder-content">
                         <span class="placeholder-icon breathing-circle">○</span>
@@ -1262,124 +1144,233 @@ class PhotoboothApp {
             `;
         }
         
-        const stripContainer = document.getElementById('stripContainer');
-        if (stripContainer) {
-            stripContainer.innerHTML = `
-                <div class="strip-placeholder placeholder-modern">
-                    <span class="strip-icon animated-strip">—</span>
-                    <p class="strip-text">create your first strip</p>
-                    <small class="strip-hint">combine multiple photos</small>
-                </div>
-            `;
-        }
-        
-        // Disable action buttons safely
-        this.safeDisableButton('processImage');
-        this.safeDisableButton('saveImage');
-        this.safeDisableButton('createStrip');
-        
-        this.showToast('New session started!', 'success');
-    }
-    
-    initializeFeatures() {
-        // Initialize any additional features
-        this.setupKeyboardShortcuts();
-    }
-    
-    setupKeyboardShortcuts() {
-        // Already handled in bindEvents, but could add more here
-    }
-    
-    handleKeyboardShortcuts(e) {
-        if (!e) return;
-        
-        // Space = capture photo (if camera is active)
-        const captureBtn = document.getElementById('capturePhoto');
-        if (e.code === 'Space' && captureBtn && captureBtn.style.display !== 'none') {
-            e.preventDefault();
-            this.capturePhoto();
-        }
-        
-        // Enter = process image
-        if (e.code === 'Enter' && this.currentImage) {
-            e.preventDefault();
-            this.processImage();
-        }
-        
-        // S = save image
-        if (e.code === 'KeyS' && e.ctrlKey && this.currentImage) {
-            e.preventDefault();
-            this.saveImage();
-        }
-        
-        // N = new session
-        if (e.code === 'KeyN' && e.ctrlKey) {
-            e.preventDefault();
-            this.newSession();
-        }
-        
-        // Numbers 1-6 = select filters
-        const filterKeys = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6'];
-        if (filterKeys.includes(e.code)) {
-            e.preventDefault();
-            const filterIndex = parseInt(e.code.slice(-1)) - 1;
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            if (filterBtns[filterIndex]) {
-                filterBtns[filterIndex].click();
+        // Disable action buttons
+        const buttons = ['processImage', 'saveImage', 'createStrip'];
+        buttons.forEach(buttonId => {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                button.disabled = true;
             }
+        });
+    }
+    
+    resetFilterSelection() {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        const noneFilter = document.querySelector('[data-filter="none"]');
+        if (noneFilter) {
+            noneFilter.classList.add('active');
         }
     }
     
-    handleResize() {
-        // Handle window resize events
-        if (this.stream) {
-            // Video will maintain aspect ratio automatically
-            const video = document.getElementById('video');
-            // Additional resize handling could go here if needed
+    // Stats management
+    updateStats(type) {
+        if (this.stats.hasOwnProperty(type)) {
+            this.stats[type]++;
+            this.updateStatsDisplay();
         }
     }
     
-    setupMagicEffects() {
-        // Setup any initial magic effects or animations
-        this.startFloatingAnimation();
+    updateStatsDisplay() {
+        const elements = {
+            photoCount: this.stats.photos,
+            filtersUsed: this.stats.filters,
+            stripsCreated: this.stats.strips
+        };
+        
+        Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        });
+    }
+    
+    // Utility methods
+    addCaptureFlash() {
+        const flash = document.createElement('div');
+        
+        Object.assign(flash.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            zIndex: '9999',
+            pointerEvents: 'none'
+        });
+        
+        document.body.appendChild(flash);
+        
+        flash.animate([
+            { opacity: 0 },
+            { opacity: 0.9 },
+            { opacity: 0 }
+        ], {
+            duration: 150,
+            easing: 'ease-out'
+        });
+        
+        setTimeout(() => {
+            if (document.body.contains(flash)) {
+                document.body.removeChild(flash);
+            }
+        }, 150);
+    }
+    
+    addElementAnimation(element, animationClass) {
+        if (!element) return;
+        
+        element.classList.add(animationClass);
+        setTimeout(() => {
+            element.classList.remove(animationClass);
+        }, 600);
+    }
+    
+    addButtonAnimation(buttonId, animationClass) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            this.addElementAnimation(button, animationClass);
+        }
+    }
+    
+    addUploadAnimation() {
+        const uploadZone = document.getElementById('uploadZone');
+        if (uploadZone) {
+            this.addElementAnimation(uploadZone, 'animate-pulse');
+        }
     }
     
     startAmbientAnimations() {
-        // Start ambient background animations
-        const orbs = document.querySelectorAll('.bg-orb');
-        orbs.forEach((orb, index) => {
-            if (orb && orb.style) {
-                orb.style.animationDelay = `${index * 2}s`;
-            }
+        // Add breathing effect to certain elements
+        const breathingElements = document.querySelectorAll('.breathing-circle, .placeholder-icon');
+        breathingElements.forEach(el => {
+            el.style.animation = 'breathingScale 4s ease-in-out infinite';
         });
         
-        const floaters = document.querySelectorAll('.float-element');
-        floaters.forEach((el, index) => {
-            if (el && el.style) {
-                el.style.animationDelay = `${index * 1.5}s`;
-            }
+        // Add floating effect to placeholders
+        const floatingElements = document.querySelectorAll('.floating-placeholder');
+        floatingElements.forEach(el => {
+            el.style.animation = 'gentleFloat 6s ease-in-out infinite';
         });
     }
     
-    startFloatingAnimation() {
-        // Additional floating animations for enhanced experience
-        const elements = document.querySelectorAll('.floating-placeholder, .breathing-circle');
-        elements.forEach(el => {
-            if (el && el.style) {
-                el.style.animation = 'float 3s ease-in-out infinite';
+    handleResize() {
+        // Handle responsive behavior if needed
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile && this.magicMenuOpen) {
+            this.closeMagicMenu();
+        }
+    }
+    
+    // Loading and toast functionality
+    showLoading(message = 'Loading...') {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            const text = overlay.querySelector('.loading-text');
+            if (text) {
+                text.textContent = message;
             }
+            overlay.classList.add('active');
+        }
+    }
+    
+    hideLoading() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+    }
+    
+    showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer') || this.createToastContainer();
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const content = document.createElement('div');
+        content.className = 'toast-content';
+        
+        const messageEl = document.createElement('span');
+        messageEl.className = 'toast-message';
+        messageEl.textContent = message;
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'toast-close';
+        closeBtn.innerHTML = '×';
+        closeBtn.onclick = () => this.removeToast(toast);
+        
+        content.appendChild(messageEl);
+        content.appendChild(closeBtn);
+        toast.appendChild(content);
+        
+        container.appendChild(toast);
+        
+        // Animate in
+        requestAnimationFrame(() => {
+            toast.style.transform = 'translateX(0)';
         });
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            this.removeToast(toast);
+        }, 5000);
+    }
+    
+    createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container toast-modern';
+        document.body.appendChild(container);
+        return container;
+    }
+    
+    removeToast(toast) {
+        if (toast && toast.parentNode) {
+            toast.style.transform = 'translateX(320px)';
+            toast.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }
+    }
+    
+    // Error handling
+    handleError(error, context = 'Unknown') {
+        console.error(`Error in ${context}:`, error);
+        this.hideLoading();
+        this.showToast(`Error: ${error.message || 'Something went wrong'}`, 'error');
+    }
+    
+    // Cleanup
+    cleanup() {
+        // Stop camera stream
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+        }
+        
+        // Clear intervals/timeouts if any
+        // Remove event listeners if needed for cleanup
+        
+        console.log('Photobooth app cleaned up');
     }
 }
 
-// Initialize the app when DOM is loaded
+// Initialize the app when the script loads
 document.addEventListener('DOMContentLoaded', () => {
-    window.photoboothApp = new PhotoboothApp();
+    window.photobooth = new PhotoboothApp();
 });
 
-// Auto-save gallery periodically
-setInterval(() => {
-    if (window.photoboothApp) {
-        window.photoboothApp.saveGallery();
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (window.photobooth) {
+        window.photobooth.cleanup();
     }
-}, 30000); // Save every 30 seconds
+});
