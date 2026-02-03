@@ -17,7 +17,7 @@ class PhotoboothApp {
     
     init() {
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.initializeApp());
+            document.addEventListener('DOMContentLoaded', () => this.initializeApp(), { once: true });
         } else {
             this.initializeApp();
         }
@@ -1402,9 +1402,14 @@ class PhotoboothApp {
 }
 
 // Initialize the app when the script loads
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.photobooth = new PhotoboothApp();
+    });
+} else {
+    // DOM is already loaded
     window.photobooth = new PhotoboothApp();
-});
+}
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {

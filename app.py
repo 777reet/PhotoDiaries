@@ -5,9 +5,8 @@ import uuid
 import base64
 import numpy as np
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from dataclasses import dataclass, asdict
-import json
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,7 +16,6 @@ from fastapi.templating import Jinja2Templates
 from PIL import Image, ImageFilter, ImageEnhance, ImageDraw, ImageFont
 import chromadb
 from chromadb.utils import embedding_functions
-import cv2
 
 # Create FastAPI app
 app = FastAPI(title="Photobooth API", version="1.0.0")
