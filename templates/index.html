@@ -3,362 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minimal Photobooth</title>
+    <title>Photobooth Studio</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <!-- Ambient background elements -->
-    <div class="ambient-bg">
-        <div class="bg-orb orb-1"></div>
-        <div class="bg-orb orb-2"></div>
-        <div class="bg-orb orb-3"></div>
+
+<!-- Ambient -->
+<div class="ambient-bg">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+</div>
+<div class="floating-elements">
+    <div class="float-element float-delay-1"></div>
+    <div class="float-element float-delay-2"></div>
+    <div class="float-element float-delay-3"></div>
+</div>
+
+<!-- Header -->
+<header class="app-header glass-effect">
+    <div class="header-content">
+        <h1 class="logo">
+            <span class="logo-accent"></span>
+            <span class="logo-text">photobooth</span>
+            <span class="logo-subtitle">studio</span>
+        </h1>
+        <div class="session-info">
+            <div class="session-indicator">
+                <span class="status-dot active"></span>
+                <span id="sessionId">session: ——</span>
+            </div>
+            <button id="newSession" class="btn btn-ghost btn-rounded btn-sm">reset</button>
+        </div>
     </div>
+</header>
 
-    <!-- Subtle floating elements -->
-    <div class="floating-elements">
-        <div class="float-element float-delay-1"></div>
-        <div class="float-element float-delay-2"></div>
-        <div class="float-element float-delay-3"></div>
-    </div>
+<!-- Main grid -->
+<div class="container main-grid">
 
-    <!-- Header -->
-    <header class="app-header glass-effect">
-        <div class="header-content">
-            <h1 class="logo">
-                <span class="logo-accent">●</span>
-                <span class="logo-text">photobooth</span>
-                <span class="logo-subtitle">studio</span>
-            </h1>
-            <div class="session-info">
-                <div class="session-indicator">
-                    <span class="status-dot active"></span>
-                    <span id="sessionId">session: new</span>
-                </div>
-                <button id="newSession" class="btn btn-ghost btn-rounded">reset</button>
-            </div>
+    <!-- ── LEFT: Capture ─────────────────────────────────────── -->
+    <div class="panel camera-panel">
+        <div class="panel-header">
+            <h2 class="panel-title"><span class="title-icon">📷</span> capture</h2>
         </div>
-    </header>
 
-    <!-- Main container -->
-    <div class="container main-grid">
-        <!-- Left Panel - Camera & Upload -->
-        <div class="panel camera-panel elevated-panel">
-            <div class="panel-header gradient-header">
-                <h2 class="panel-title">
-                    <span class="title-icon">📷</span>
-                    capture
-                </h2>
-                <div class="panel-accent-line"></div>
-            </div>
-            
-            <!-- Camera/Upload Section -->
-            <div class="capture-section">
-                <div class="camera-preview rounded-lg" id="cameraPreview">
-                    <video id="video" autoplay playsinline></video>
-                    <canvas id="canvas" style="display: none;"></canvas>
-                    <div class="camera-overlay">
-                        <div class="viewfinder modern-viewfinder">
-                            <div class="corner corner-tl"></div>
-                            <div class="corner corner-tr"></div>
-                            <div class="corner corner-bl"></div>
-                            <div class="corner corner-br"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="capture-controls control-stack">
-                    <button id="startCamera" class="btn btn-primary btn-large btn-rounded">
-                        <span class="btn-icon">▶</span>
-                        start camera
-                    </button>
-                    <button id="capturePhoto" class="btn btn-accent btn-large btn-rounded btn-pulse" style="display: none;">
-                        <span class="btn-icon">●</span>
-                        capture
-                    </button>
-                    <button id="stopCamera" class="btn btn-secondary btn-large btn-rounded" style="display: none;">
-                        <span class="btn-icon">⏹</span>
-                        stop
-                    </button>
-                </div>
-                
-                <div class="upload-section">
-                    <div class="upload-zone modern-upload" id="uploadZone">
-                        <input type="file" id="fileInput" accept="image/*" multiple>
-                        <div class="upload-content">
-                            <div class="upload-icon-container">
-                                <span class="upload-icon animated-plus">+</span>
-                            </div>
-                            <div class="upload-text">
-                                <p class="upload-primary">drop images or browse</p>
-                                <small class="upload-secondary">multiple files supported</small>
-                            </div>
-                        </div>
-                        <div class="upload-glow"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enhanced Stats -->
-            <div class="stats-mini stats-enhanced">
-                <div class="stat-item stat-card">
-                    <span class="stat-label">photos</span>
-                    <span class="stat-value" id="photoCount">0</span>
-                </div>
-                <div class="stat-item stat-card">
-                    <span class="stat-label">filters</span>
-                    <span class="stat-value" id="filtersUsed">0</span>
-                </div>
-                <div class="stat-item stat-card">
-                    <span class="stat-label">strips</span>
-                    <span class="stat-value" id="stripsCreated">0</span>
+        <!-- Camera preview -->
+        <div class="camera-preview" id="cameraPreview">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="camera-overlay">
+                <div class="modern-viewfinder">
+                    <div class="corner corner-tl"></div>
+                    <div class="corner corner-tr"></div>
+                    <div class="corner corner-bl"></div>
+                    <div class="corner corner-br"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Center Panel - Preview & Filters -->
-        <div class="panel preview-panel hero-panel">
-            <div class="panel-header gradient-header">
-                <h2 class="panel-title">
-                    <span class="title-icon">✨</span>
-                    style
-                </h2>
-                <div class="panel-accent-line"></div>
-            </div>
-            
-            <!-- Image Preview -->
-            <div class="image-preview preview-enhanced" id="imagePreview">
-                <div class="preview-placeholder floating-placeholder">
-                    <div class="placeholder-content">
-                        <span class="placeholder-icon breathing-circle">○</span>
-                        <p class="placeholder-text">your image appears here</p>
-                        <div class="placeholder-hint">upload or capture to begin</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Filter Controls -->
-            <div class="filter-section">
-                <h3 class="section-title">
-                    filters
-                    <span class="section-accent"></span>
-                </h3>
-                <div class="filter-grid modern-grid">
-                    <button class="filter-btn filter-card active" data-filter="none">
-                        <div class="filter-preview"></div>
-                        <span class="filter-name">original</span>
-                    </button>
-                    <button class="filter-btn filter-card" data-filter="vintage">
-                        <div class="filter-preview vintage-preview"></div>
-                        <span class="filter-name">vintage</span>
-                    </button>
-                    <button class="filter-btn filter-card" data-filter="bw">
-                        <div class="filter-preview bw-preview"></div>
-                        <span class="filter-name">mono</span>
-                    </button>
-                    <button class="filter-btn filter-card" data-filter="blur">
-                        <div class="filter-preview blur-preview"></div>
-                        <span class="filter-name">soft</span>
-                    </button>
-                    <button class="filter-btn filter-card" data-filter="enhance">
-                        <div class="filter-preview enhance-preview"></div>
-                        <span class="filter-name">vibrant</span>
-                    </button>
-                    <button class="filter-btn filter-card" data-filter="retro">
-                        <div class="filter-preview retro-preview"></div>
-                        <span class="filter-name">retro</span>
-                    </button>
-                </div>
-            </div>
+        <!-- Camera controls -->
+        <div class="control-stack">
+            <button id="startCamera" class="btn btn-primary btn-large btn-rounded">
+                <span class="btn-icon">▶</span> start camera
+            </button>
+            <button id="capturePhoto" class="btn btn-accent btn-large btn-rounded" style="display:none">
+                <span class="btn-icon">●</span> capture
+            </button>
+            <button id="stopCamera" class="btn btn-secondary btn-large btn-rounded" style="display:none">
+                <span class="btn-icon">⏹</span> stop
+            </button>
+        </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons action-stack">
-                <button id="processImage" class="btn btn-primary btn-large btn-rounded" disabled>
-                    <span class="btn-icon">⚡</span>
-                    apply
-                </button>
-                <button id="saveImage" class="btn btn-accent btn-large btn-rounded" disabled>
-                    <span class="btn-icon">💾</span>
-                    save
-                </button>
-                <button id="createStrip" class="btn btn-gradient btn-large btn-rounded btn-special" disabled>
-                    <span class="btn-icon">📸</span>
-                    create strip
-                </button>
+        <!-- Upload -->
+        <div class="upload-section">
+            <div class="upload-zone modern-upload" id="uploadZone">
+                <input type="file" id="fileInput" accept="image/*" multiple>
+                <div class="upload-content">
+                    <span class="animated-plus">+</span>
+                    <p class="upload-primary">drop images or browse</p>
+                    <small class="upload-secondary">multiple files · max 15 MB each</small>
+                </div>
             </div>
         </div>
 
-        <!-- Right Panel - Gallery & Features -->
-        <div class="panel gallery-panel sidebar-panel">
-            <div class="panel-header gradient-header">
-                <h2 class="panel-title">
-                    <span class="title-icon">🎨</span>
-                    gallery
-                </h2>
-                <div class="panel-controls">
-                    <button id="refreshGallery" class="btn btn-ghost btn-sm btn-rounded">refresh</button>
-                    <button id="clearGallery" class="btn btn-ghost btn-sm btn-rounded">clear</button>
-                </div>
+        <!-- Stats -->
+        <div class="stats-enhanced">
+            <div class="stat-card">
+                <span class="stat-label">photos</span>
+                <span class="stat-value" id="photoCount">0</span>
             </div>
-            
-            <!-- Image Gallery -->
-            <div class="gallery-grid masonry-grid" id="galleryGrid">
-                <!-- Images will be populated here -->
+            <div class="stat-card">
+                <span class="stat-label">filters</span>
+                <span class="stat-value" id="filtersUsed">0</span>
             </div>
-            
-            <!-- Enhanced Features -->
-            <div class="fun-features features-enhanced">
-                <div class="feature-tabs modern-tabs">
-                    <button class="tab-btn tab-modern active" data-tab="templates">
-                        <span class="tab-icon">📋</span>
-                        templates
-                    </button>
-                    <button class="tab-btn tab-modern" data-tab="frames">
-                        <span class="tab-icon">🖼️</span>
-                        frames
-                    </button>
-                    <button class="tab-btn tab-modern" data-tab="effects">
-                        <span class="tab-icon">✨</span>
-                        effects
-                    </button>
-                </div>
-                
-                <!-- Templates Tab -->
-                <div class="tab-content tab-enhanced active" id="templates">
-                    <div class="template-grid option-grid">
-                        <div class="template-item option-card" data-template="collage">
-                            <div class="option-icon">⊞</div>
-                            <span class="option-name">collage</span>
-                        </div>
-                        <div class="template-item option-card" data-template="mirror">
-                            <div class="option-icon">⟷</div>
-                            <span class="option-name">mirror</span>
-                        </div>
-                        <div class="template-item option-card" data-template="split">
-                            <div class="option-icon">⫽</div>
-                            <span class="option-name">split</span>
-                        </div>
-                        <div class="template-item option-card" data-template="grid">
-                            <div class="option-icon">⊟</div>
-                            <span class="option-name">grid</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Frames Tab -->
-                <div class="tab-content tab-enhanced" id="frames">
-                    <div class="frame-grid option-grid">
-                        <div class="frame-item option-card" data-frame="classic">
-                            <div class="option-icon">◻</div>
-                            <span class="option-name">classic</span>
-                        </div>
-                        <div class="frame-item option-card" data-frame="minimal">
-                            <div class="option-icon">○</div>
-                            <span class="option-name">minimal</span>
-                        </div>
-                        <div class="frame-item option-card" data-frame="modern">
-                            <div class="option-icon">◇</div>
-                            <span class="option-name">modern</span>
-                        </div>
-                        <div class="frame-item option-card" data-frame="film">
-                            <div class="option-icon">⬢</div>
-                            <span class="option-name">film</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Effects Tab -->
-                <div class="tab-content tab-enhanced" id="effects">
-                    <div class="effect-grid option-grid">
-                        <div class="effect-item option-card" data-effect="fade">
-                            <div class="option-icon">◐</div>
-                            <span class="option-name">fade</span>
-                        </div>
-                        <div class="effect-item option-card" data-effect="glow">
-                            <div class="option-icon">✦</div>
-                            <span class="option-name">glow</span>
-                        </div>
-                        <div class="effect-item option-card" data-effect="shadow">
-                            <div class="option-icon">◓</div>
-                            <span class="option-name">shadow</span>
-                        </div>
-                        <div class="effect-item option-card" data-effect="texture">
-                            <div class="option-icon">▦</div>
-                            <span class="option-name">texture</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="stat-card">
+                <span class="stat-label">strips</span>
+                <span class="stat-value" id="stripsCreated">0</span>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Panel - Photo Strip Preview -->
-    <div class="strip-preview strip-enhanced" id="stripPreview">
-        <div class="strip-header header-modern">
-            <h3 class="strip-title">
-                <span class="strip-icon-modern">📱</span>
-                photo strip
-            </h3>
-            <div class="strip-controls control-group">
-                <button id="downloadStrip" class="btn btn-accent btn-sm btn-rounded">
-                    <span class="btn-icon">⬇</span>
-                    download
+    <!-- ── CENTRE: Style ─────────────────────────────────────── -->
+    <div class="panel preview-panel">
+        <div class="panel-header">
+            <h2 class="panel-title"><span class="title-icon"></span> style</h2>
+        </div>
+
+        <!-- Image preview -->
+        <div class="image-preview preview-enhanced" id="imagePreview">
+            <div class="preview-placeholder floating-placeholder">
+                <div class="placeholder-content">
+                    <span class="placeholder-icon breathing-circle">○</span>
+                    <p class="placeholder-text">your image appears here</p>
+                    <div class="placeholder-hint">upload or capture to begin</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <h3 class="section-title">filters <span class="section-accent"></span></h3>
+            <div class="filter-grid modern-grid">
+                <button class="filter-btn filter-card active" data-filter="none">
+                    <div class="filter-preview"></div>
+                    <span class="filter-name">original</span>
                 </button>
-                <button id="shareStrip" class="btn btn-primary btn-sm btn-rounded">
-                    <span class="btn-icon">↗</span>
-                    share
+                <button class="filter-btn filter-card" data-filter="vintage">
+                    <div class="filter-preview vintage-preview"></div>
+                    <span class="filter-name">vintage</span>
                 </button>
-                <button id="printStrip" class="btn btn-secondary btn-sm btn-rounded">
-                    <span class="btn-icon">🖨</span>
-                    print
+                <button class="filter-btn filter-card" data-filter="bw">
+                    <div class="filter-preview bw-preview"></div>
+                    <span class="filter-name">mono</span>
+                </button>
+                <button class="filter-btn filter-card" data-filter="blur">
+                    <div class="filter-preview blur-preview"></div>
+                    <span class="filter-name">soft</span>
+                </button>
+                <button class="filter-btn filter-card" data-filter="enhance">
+                    <div class="filter-preview enhance-preview"></div>
+                    <span class="filter-name">vibrant</span>
+                </button>
+                <button class="filter-btn filter-card" data-filter="retro">
+                    <div class="filter-preview retro-preview"></div>
+                    <span class="filter-name">retro</span>
                 </button>
             </div>
         </div>
-        <div class="strip-container container-modern" id="stripContainer">
-            <div class="strip-placeholder placeholder-modern">
-                <span class="strip-icon animated-strip">—</span>
-                <p class="strip-text">create your first strip</p>
-                <small class="strip-hint">combine multiple photos</small>
-            </div>
+
+        <!-- Action buttons -->
+        <div class="action-stack">
+            <button id="processImage" class="btn btn-primary btn-large btn-rounded" disabled>
+                <span class="btn-icon"></span> apply filter
+            </button>
+            <button id="saveImage" class="btn btn-accent btn-large btn-rounded" disabled>
+                <span class="btn-icon"></span> save image
+            </button>
+            <button id="createStrip" class="btn btn-gradient btn-large btn-rounded" disabled>
+                <span class="btn-icon"></span> create strip
+            </button>
         </div>
     </div>
 
-    <!-- Floating Action Button -->
-    <div class="fab-container fab-modern">
-        <button class="fab fab-enhanced" id="magicFab">
-            <span class="fab-icon rotating-plus">+</span>
+    <!-- ── RIGHT: Gallery + Effects ──────────────────────────── -->
+    <div class="panel gallery-panel">
+        <div class="panel-header">
+            <h2 class="panel-title"><span class="title-icon"></span> gallery</h2>
+            <div class="panel-controls">
+                <button id="refreshGallery" class="btn btn-ghost btn-sm btn-rounded">refresh</button>
+                <button id="clearGallery"   class="btn btn-ghost btn-sm btn-rounded">clear</button>
+            </div>
+        </div>
+
+        <!-- Gallery grid -->
+        <div class="gallery-grid masonry-grid" id="galleryGrid">
+            <div class="gallery-empty">no photos yet</div>
+        </div>
+
+        <!-- Effects / Templates / Frames -->
+        <div class="features-enhanced">
+
+            <!-- Tab row -->
+            <div class="modern-tabs">
+                <button class="tab-btn tab-modern active" data-tab="templates">templates</button>
+                <button class="tab-btn tab-modern" data-tab="frames">frames</button>
+                <button class="tab-btn tab-modern" data-tab="effects">effects</button>
+            </div>
+
+            <!-- Templates -->
+            <div class="tab-enhanced active" id="templates">
+                <div class="template-grid option-grid">
+                    <button class="template-item option-card" data-template="collage">
+                        <div class="option-icon">⊞</div>
+                        <span class="option-name">collage</span>
+                    </button>
+                    <button class="template-item option-card" data-template="mirror">
+                        <div class="option-icon">⟷</div>
+                        <span class="option-name">mirror</span>
+                    </button>
+                    <button class="template-item option-card" data-template="split">
+                        <div class="option-icon">⫽</div>
+                        <span class="option-name">split</span>
+                    </button>
+                    <button class="template-item option-card" data-template="grid">
+                        <div class="option-icon">⊟</div>
+                        <span class="option-name">grid</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Frames -->
+            <div class="tab-enhanced" id="frames">
+                <div class="frame-grid option-grid">
+                    <button class="frame-item option-card" data-frame="classic">
+                        <div class="option-icon">◻</div>
+                        <span class="option-name">classic</span>
+                    </button>
+                    <button class="frame-item option-card" data-frame="minimal">
+                        <div class="option-icon">○</div>
+                        <span class="option-name">minimal</span>
+                    </button>
+                    <button class="frame-item option-card" data-frame="modern">
+                        <div class="option-icon">◇</div>
+                        <span class="option-name">modern</span>
+                    </button>
+                    <button class="frame-item option-card" data-frame="film">
+                        <div class="option-icon">⬢</div>
+                        <span class="option-name">film</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Effects -->
+            <div class="tab-enhanced" id="effects">
+                <div class="effect-grid option-grid">
+                    <button class="effect-item option-card" data-effect="fade">
+                        <div class="option-icon">◐</div>
+                        <span class="option-name">fade</span>
+                    </button>
+                    <button class="effect-item option-card" data-effect="glow">
+                        <div class="option-icon">✦</div>
+                        <span class="option-name">glow</span>
+                    </button>
+                    <button class="effect-item option-card" data-effect="shadow">
+                        <div class="option-icon">◓</div>
+                        <span class="option-name">shadow</span>
+                    </button>
+                    <button class="effect-item option-card" data-effect="texture">
+                        <div class="option-icon">▦</div>
+                        <span class="option-name">texture</span>
+                    </button>
+                </div>
+            </div>
+
+        </div><!-- /features-enhanced -->
+    </div><!-- /gallery-panel -->
+
+</div><!-- /main-grid -->
+
+<!-- ── Strip preview (bottom) ────────────────────────────────── -->
+<div class="strip-preview strip-enhanced" id="stripPreview">
+    <div class="header-modern">
+        <h3 class="strip-title">
+            <span class="strip-icon-modern"></span> photo strip
+        </h3>
+        <div class="control-group">
+            <button id="downloadStrip" class="btn btn-accent btn-sm btn-rounded">
+                <span class="btn-icon">⬇</span> download
+            </button>
+            <button id="shareStrip" class="btn btn-primary btn-sm btn-rounded">
+                <span class="btn-icon">↗</span> share
+            </button>
+            <button id="printStrip" class="btn btn-secondary btn-sm btn-rounded">
+                <span class="btn-icon">🖨</span> print
+            </button>
+        </div>
+    </div>
+
+    <div class="strip-container container-modern" id="stripContainer">
+        <div class="strip-placeholder">
+            <span class="animated-strip">——</span>
+            <p class="strip-text">create your first strip</p>
+            <small class="strip-hint">need at least 2 photos in the gallery</small>
+        </div>
+    </div>
+</div>
+
+<!-- FAB -->
+<div class="fab-container fab-modern">
+    <button class="fab fab-enhanced" id="magicFab">
+        <span class="fab-icon rotating-plus">+</span>
+    </button>
+    <div class="fab-menu menu-enhanced">
+        <button class="fab-option option-enhanced" data-action="random-filter">
+             random filter
         </button>
-        <div class="fab-menu menu-enhanced">
-            <button class="fab-option option-enhanced" data-action="random-filter">
-                <span class="option-icon">🎲</span>
-                random
-            </button>
-            <button class="fab-option option-enhanced" data-action="auto-enhance">
-                <span class="option-icon">✨</span>
-                enhance
-            </button>
-            <button class="fab-option option-enhanced" data-action="surprise-me">
-                <span class="option-icon">🎪</span>
-                surprise
-            </button>
-        </div>
+        <button class="fab-option option-enhanced" data-action="auto-enhance">
+             auto enhance
+        </button>
+        <button class="fab-option option-enhanced" data-action="surprise-me">
+             surprise me
+        </button>
     </div>
+</div>
 
-    <!-- Toast Notifications -->
-    <div class="toast-container toast-modern" id="toastContainer"></div>
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay overlay-modern" id="loadingOverlay">
-        <div class="loading-content content-modern">
-            <div class="loading-spinner spinner-enhanced"></div>
-            <p class="loading-text">processing...</p>
-            <div class="loading-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
+<!-- Loading overlay -->
+<div class="loading-overlay overlay-modern" id="loadingOverlay">
+    <div class="loading-content content-modern">
+        <div class="loading-spinner spinner-enhanced"></div>
+        <p class="loading-text">processing…</p>
+        <div class="loading-dots"><span></span><span></span><span></span></div>
     </div>
+</div>
 
-    <script src="/static/script.js"></script>
+<script src="/static/script.js"></script>
 </body>
 </html>

@@ -314,16 +314,19 @@ async def upload_image(
         image.save(img_buffer, format='PNG')
         img_base64 = base64.b64encode(img_buffer.getvalue()).decode()
         
+        # Prepare metadata for ChromaDB (simple primitive types only)
+        metadata_dict = asdict(metadata)
+        metadata_dict['timestamp'] = metadata.timestamp.isoformat()
+        metadata_dict['session_id'] = session_id
+        metadata_dict['image_data'] = img_base64
+        metadata_dict['filters_applied'] = ', '.join(filters_applied) if filters_applied else ''
+        metadata_dict['dimensions'] = f"{original_size[0]}x{original_size[1]}"
+        
         # Store in vector database
         collection.add(
             embeddings=[image_features],
             documents=[image_description],
-            metadatas=[{
-                **asdict(metadata),
-                'timestamp': metadata.timestamp.isoformat(),
-                'session_id': session_id,
-                'image_data': img_base64
-            }],
+            metadatas=[metadata_dict],
             ids=[image_id]
         )
         
@@ -549,12 +552,12 @@ if __name__ == "__main__":
     os.makedirs("./templates", exist_ok=True)
     os.makedirs("./uploads", exist_ok=True)
     
-    print("🚀 Starting Photobooth Server...")
-    print("📸 Main App: http://localhost:8000")
-    print("📖 API Docs: http://localhost:8000/docs")
-    print("🏥 Health Check: http://localhost:8000/api/health")
+    print(" Starting Photobooth Server...")
+    print(" Main App: http://localhost:8000")
+    print(" API Docs: http://localhost:8000/docs")
+    print(" Health Check: http://localhost:8000/api/health")
     
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
 
 
 
