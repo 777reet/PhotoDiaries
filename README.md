@@ -1,42 +1,53 @@
 # Photobooth Studio
 
-A modern web-based photobooth application with AI-powered image similarity search. Features a FastAPI backend with ChromaDB vector database for intelligent photo management and discovery.
+A web-based photobooth application that combines real-time photo capture, image editing, and AI-powered image similarity search. Users can capture photos using their webcam or upload existing images, apply filters, generate photobooth strips, and discover visually similar images through vector-based search.
 
 ## Features
 
-- **Camera Integration**: Live webcam capture with viewfinder overlay
-- **File Upload**: Drag-and-drop or browse to upload multiple images
-- **Real-time Filters**: Apply vintage, black & white, blur, enhance, and retro effects
-- **Photo Strips**: Combine multiple photos into classic photobooth strips
-- **Vector Search**: Find similar images using AI-powered similarity matching
-- **Session Management**: Persistent sessions with unique IDs and cross-session search
-- **Interactive Effects**: Confetti, sparkles, and dynamic color schemes
-- **API Integration**: Full backend processing with metadata storage
+* Live webcam capture with real-time preview
+* Upload and edit multiple images
+* Built-in filters including Vintage, Black & White, Blur, Enhance, and Retro
+* Generate classic photobooth strips
+* AI-powered image similarity search using vector embeddings
+* Persistent image indexing and session management
+* Responsive and interactive user interface
+* Automatic image processing and metadata storage
 
 ## Tech Stack
 
-**Frontend:**
-- Pure JavaScript (ES6+) with Canvas API for image processing
-- HTML5 MediaDevices API for camera access
-- CSS3 animations and modern UI components
+### Frontend
 
-**Backend:**
-- FastAPI with automatic API documentation
-- ChromaDB vector database for image embeddings
-- PIL/Pillow for server-side image processing
-- NumPy for advanced filter algorithms
+* HTML5,    CSS3,   JavaScript,   Canvas API,   MediaDevices API.
 
-**Features:**
-- Vector similarity search for finding related photos
-- Persistent storage across sessions
-- RESTful API with JSON responses
-- Automatic image feature extraction and indexing
+### Backend
 
-## Usage
+* FastAPI,  ChromaDB,  Pillow (PIL),   NumPy.
 
-1. Start the FastAPI server: `python app.py`
-2. Open `http://localhost:8000` in a modern web browser
-3. Grant camera permissions or upload images to start editing
-4. Images are automatically indexed for similarity search
+## Installation
 
-## Outputs 
+Install the required dependencies and start the application:
+
+```bash
+python app.py
+```
+
+Open the application in your browser:
+
+```text
+http://localhost:8000
+```
+
+## Outputs
+
+### Output 1
+
+![Output 1](outputs/first.png)
+
+### Output 2
+
+![Output 2](outputs/second.png)
+
+
+### Output 4
+
+![Output 4](outputs/fourth.png)
