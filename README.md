@@ -47,9 +47,6 @@ http://localhost:8000
 
 ![Output 2](outputs/second.png)
 
-### Output 3
-
-![Output 3](outputs/third.png)
 
 ### Output 4
 
