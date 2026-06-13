@@ -17,18 +17,11 @@ A web-based photobooth application that combines real-time photo capture, image 
 
 ### Frontend
 
-* HTML5
-* CSS3
-* JavaScript (ES6+)
-* Canvas API
-* MediaDevices API
+* HTML5,    CSS3,   JavaScript,   Canvas API,   MediaDevices API.
 
 ### Backend
 
-* FastAPI
-* ChromaDB
-* Pillow (PIL)
-* NumPy
+* FastAPI,  ChromaDB,  Pillow (PIL),   NumPy.
 
 ## Installation
 
